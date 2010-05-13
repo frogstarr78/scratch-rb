@@ -46,6 +46,18 @@ class String
   end
 end
 
+class StackTooSmall < Exception
+  def message
+    "Not enough items on stack"
+  end
+end
+
+class UnexpectedEOI < Exception
+  def message
+    "Unexpected end of input"
+  end
+end
+
 class ScratchLexer
   attr_accessor :words, :generator
   def initialize txt
@@ -112,12 +124,15 @@ class ScratchLexer
 end
 
 class Scratch
-  attr_accessor :dictionary, :stack, :lexer
+  attr_accessor :dictionary, :stack, :buffer, :data_stack, :lexer, :latest
+  IMMEDIATES = %w(VAR CONST " /* DEF END)
 
   def initialize
     @dictionary = {}
-    @stack = []
-    @lexer = nil
+    @buffer     = []
+    @data_stack = []
+    @stack      = @data_stack
+    @lexer      = nil
   end
 
   def add_words new_dict
@@ -134,37 +149,52 @@ class Scratch
     lambda {|terp| terp.stack << value }
   end
 
+  def compile word
+    word.upcase!
+    if dictionary.has_key?( word )
+      return dictionary[word]
+    elsif word.is_numeric?
+      return word.to_i
+    else
+      raise "Unknown word '#{word}'."
+    end
+  end
+
+  def start_compiling
+    self.stack = self.buffer
+  end
+
+  def stop_compiling
+    self.stack = self.data_stack
+  end
+
+  def compiling?
+    self.stack == self.buffer
+  end
+
   def run text
     self.lexer = ScratchLexer.new(text)
 
     while word = lexer.next_word
-      word.upcase!
-      if dictionary.has_key?( word )
+      token = self.compile word
+      puts "word '#{word}'" if DEBUG
+      if IMMEDIATES.include? word
         puts "word '#{word}'" if DEBUG
-        dictionary[word].call(self)
-      elsif word.is_numeric?
-        stack << word.to_i
+        self.interpret token
+      elsif self.compiling?
+        self.stack << token
       else
-        raise "Unknown word '#{word}'."
+        self.interpret token
       end
-#      word = lexer.next_word
     end
   end
 
-  def lookup word
-    dictionary[word]
-  end
-end
-
-class StackTooSmall < Exception
-  def message
-    "Not enough items on stack"
-  end
-end
-
-class UnexpectedEOI < Exception
-  def message
-    "Unexpected end of input"
+  def interpret word
+    if word.is_a? Proc
+      word.call self
+    else
+      self.stack << word
+    end
   end
 end
 
@@ -267,49 +297,26 @@ CommentWords = {
   end
 }
 
-FunctionWords = {
+CompilingWords = {
   "DEF" => lambda do |terp|
     func_name = terp.lexer.next_word
     raise UnexpectedEOI.new if func_name.nil?
-    done = false
 
-    code = []
-    until done
-      word = terp.lexer.next_word
-      raise UnexpectedEOI.new if func_name.nil?
+    terp.latest = func_name
+    terp.start_compiling
+  end,
 
-      word.upcase!
-      done = true and break if word == 'END'
-      
-      found_word = terp.lookup(word)
-      if found_word
-        case word
-        when "VAR", "CONST", '"', '/*'
-          found_word.call terp
-        else
-          code << found_word
-        end
-      elsif word.is_numeric?
-        code << word.to_i
-      else
-        raise "Unknown word '#{word}'!"
-      end
-    end
-
+  "END" => lambda do |terp|
+    code = terp.stack.dup
+    terp.stack = []
     terp.define_variable(
-      func_name, lambda do |terp|
-        pointer = 0
-        while pointer < code.size
-          word = code[pointer]
-          if word.is_a? Proc
-            word.call(terp)
-          else
-            terp.stach << word
-          end
-          pointer += 1
+      terp.latest, lambda do |terp|
+        code.each do |word|
+          terp.interpret word
         end
-      end 
+      end
     )
+    terp.stop_compiling
   end
 }
 
@@ -360,9 +367,9 @@ terp.add_words( VariableWords )
 terp.add_words( ConstantWords )
 terp.add_words( StringWords )
 terp.add_words( CommentWords )
-terp.add_words( CommentWords )
-terp.add_words( FunctionWords )
+#terp.add_words( FunctionWords )
 terp.add_words( StackWords )
+terp.add_words( CompilingWords )
 
 #terp.run "1 2 3 45 678"
 #terp.run "pstack"
@@ -384,8 +391,8 @@ terp.add_words( StackWords )
 #terp.run '" ----------------------" print'
 #terp.run "10 pstack"
 #terp.run "1 2 3 print print print"
-#terp.run "2 2 + print"
-#terp.run "2 2 - print"
+terp.run "2 2 + print"
+terp.run "2 2 - print"
 #terp.run "4 2 / print"
 #terp.run "3 3 * 4 4 * + √ print"
 #terp.run "var a"
