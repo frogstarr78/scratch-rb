@@ -459,6 +459,23 @@ ControlWords = {
     unless is_true
       terp.interpret terp.make_word(list)
     end
+  end, 
+
+  "IF_ELSE?" => lambda do |terp|
+    terp.error_if_stack_isnt_sufficient! :<, 3
+    false_code = terp.stack.pop
+    true_code = terp.stack.pop
+    cond = terp.stack.pop
+
+    raise Scratch::MissingListExpectation.new(true_code) unless true_code.is_a? Array
+    raise Scratch::MissingListExpectation.new(false_code) unless false_code.is_a? Array
+
+    is_true = cond.call(terp)
+    if is_true
+      terp.interpret terp.make_word(true_code)
+    else
+      terp.interpret terp.make_word(false_code)
+    end
   end
 }
 
@@ -527,11 +544,13 @@ terp.add_words( LogicWords )
 #terp.run '[ 1 " hello" print ] .'
 #terp.run '[ 1 2 3 ] run .'
 #terp.run '[ 1 ! ] 5 times'
-terp.run 'false [ 1 ! ] is_true?'
-terp.run 'true [ 3 ! ] is_true?'
-terp.run 'false [ 2 ! ] is_false?'
-terp.run 'true [ 4 ! ] is_false?'
-terp.run 'false [ 5 ! ] is_false?'
-terp.run 'false [ 6 ! ] is_false?'
-terp.run 'true [ 7 ! ] is_false?'
+#terp.run 'false [ 1 ! ] is_true?'
+#terp.run 'true [ 3 ! ] is_true?'
+#terp.run 'false [ 2 ! ] is_false?'
+#terp.run 'true [ 4 ! ] is_false?'
+#terp.run 'false [ 5 ! ] is_false?'
+#terp.run 'false [ 6 ! ] is_false?'
+#terp.run 'true [ 7 ! ] is_false?'
+#terp.run 'true [ 7 ! ] [ 8 ! ] if_else?'
+#terp.run 'false [ 7 ! ] [ 8 ! ] if_else?'
 #puts terp.dictionary.inspect
