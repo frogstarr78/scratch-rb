@@ -437,7 +437,7 @@ ControlWords = {
     end
   end,
 
-  "IS_TRUE" => lambda do |terp|
+  "IS_TRUE?" => lambda do |terp|
     terp.error_if_stack_isnt_sufficient! :<, 2
     code = terp.stack.pop
     cond = terp.stack.pop
@@ -449,7 +449,7 @@ ControlWords = {
     end
   end, 
 
-  "IS_FALSE" => lambda do |terp|
+  "IS_FALSE?" => lambda do |terp|
     terp.error_if_stack_isnt_sufficient! :<, 2
     list = terp.stack.pop
     cond = terp.stack.pop
@@ -527,12 +527,11 @@ terp.add_words( LogicWords )
 #terp.run '[ 1 " hello" print ] .'
 #terp.run '[ 1 2 3 ] run .'
 #terp.run '[ 1 ! ] 5 times'
-DEBUG=true
-terp.run 'false [ 1 ! ] is_true'
-terp.run 'true [ 3 ! ] is_true'
-terp.run 'false [ 2 ! ] is_false'
-terp.run 'true [ 4 ! ] is_false'
-terp.run 'false [ 5 ! ] is_false'
-terp.run 'false [ 6 ! ] is_false'
-terp.run 'true [ 7 ! ] is_false'
+terp.run 'false [ 1 ! ] is_true?'
+terp.run 'true [ 3 ! ] is_true?'
+terp.run 'false [ 2 ! ] is_false?'
+terp.run 'true [ 4 ! ] is_false?'
+terp.run 'false [ 5 ! ] is_false?'
+terp.run 'false [ 6 ! ] is_false?'
+terp.run 'true [ 7 ! ] is_false?'
 #puts terp.dictionary.inspect
