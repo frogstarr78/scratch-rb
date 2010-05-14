@@ -1,9 +1,7 @@
 require 'generator' 
 require 'delegate'
 require 'rubygems'
-require 'ruby-debug'
 
-DEBUG=false
 class Variable
   def initialize v = 0
     @value = v
@@ -83,28 +81,6 @@ class ScratchLexer
         word << char
       end
     end
-    word
-  end
-
-  def _next_word
-
-    char = generator.next
-    # init word
-    return nil unless not char.empty? or generator.next?
-
-    # ignore whitespace
-    while char.is_whitespace?
-      return nil unless generator.next?
-      char = generator.next
-    end
-
-    word = ""
-
-    until char.is_whitespace? #or !generator.next? # again
-      word << char
-      char = generator.next
-    end
-
     word
   end
 end
@@ -429,7 +405,6 @@ LogicWords = {
   end,
 
   "OR" => lambda do |terp|
-    puts terp.stack.inspect
     terp.error_if_stack_isnt_sufficient! :<, 2
     term2 = terp.stack.pop
     term1 = terp.stack.pop
