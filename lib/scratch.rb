@@ -1,6 +1,4 @@
 require 'generator' 
-require 'delegate'
-require 'rubygems'
 
 class Variable
   def initialize v = 0
@@ -17,9 +15,9 @@ class Variable
 end
 
 class NilClass
-  def is_whitespace?
-    false
-  end
+#  def is_whitespace?
+#    false
+#  end
 
   def blank?
     true
@@ -113,7 +111,7 @@ class Scratch
     @dictionary = {}
     @buffer     = []
     @data_stack = []
-    @stack      = SimpleDelegator.new @data_stack
+    @stack      = @data_stack
     @lexer      = nil
   end
 
@@ -136,11 +134,11 @@ class Scratch
   end
 
   def start_compiling
-    self.stack.__setobj__ self.buffer
+    self.stack = self.buffer
   end
 
   def stop_compiling
-    self.stack.__setobj__ self.data_stack
+    self.stack = self.data_stack
   end
 
   def compiling?
@@ -356,8 +354,8 @@ StackWords = {
 ListWords = {
   "[" => lambda do |terp|
     list = []
-    old_stack = terp.stack.__getobj__
-    terp.stack.__setobj__ list
+    old_stack = terp.stack
+    terp.stack = list
 
     loop do
       word = terp.lexer.next_word
@@ -372,7 +370,7 @@ ListWords = {
       end
     end
 
-    terp.stack.__setobj__ old_stack
+    terp.stack = old_stack
     terp.stack << list
   end, 
 
@@ -542,7 +540,6 @@ ControlWords = {
   end
 }
 
-
 terp = Scratch.new
 terp.add_words( PrintingWords )
 terp.add_words( MathWords )
@@ -557,64 +554,64 @@ terp.add_words( ControlWords )
 terp.add_words( ComparisonWords )
 terp.add_words( LogicWords )
 
-#terp.run "1 2 3 45 678"
-#terp.run "pstack"
-#terp.run '" ----------------------" print'
-#terp.run '" - dup" print'
-#terp.run "dup pstack"
-#terp.run '" ----------------------" print'
-#terp.run '" - drop" print'
-#terp.run "drop pstack"
-#terp.run '" ----------------------" print'
-#terp.run '" - swap" print'
-#terp.run "swap pstack"
-#terp.run '" ----------------------" print'
-#terp.run '" - over" print'
-#terp.run "over pstack"
-#terp.run '" ----------------------" print'
-#terp.run '" - rot" print'
-#terp.run "rot pstack"
-#terp.run '" ----------------------" print'
-#terp.run "10 pstack"
-#terp.run "1 2 3 print print print"
-#terp.run "2 2 + print"
-#terp.run "2 2 - print"
-#terp.run "4 2 / print"
-#terp.run "3 3 * 4 4 * + √ print"
-#terp.run "var a"
-#terp.run "var b"
-#terp.run "12 b store"
-#terp.run "10 a store"
-#terp.run "a fetch print"
-#terp.run "b fetch print"
-#terp.run "12 a store"
-#terp.run "a fetch print"
-#terp.run "b fetch print"
-#terp.run "5 const Q"
-#terp.run "Q print"
-#terp.run '" Hello World!" print'
-#terp.run '/* abc */ " Hello World!" print'
-#terp.run '/* abc */ Q print'
-#terp.run 'def hypot  dup * swap dup * + √  end'
-#terp.run '3 4 hypot .'
-#terp.run '[ 1 2 3 ] .'
-#terp.run '[ 1 2 3 [ 4 5 6 ] 7 ] .'
-#terp.run '[ 1 2 3 [ 4 5 6 ] 7 ] 3 item .'
-#terp.run '[ 1 2 3 ] 1 item .'
-#terp.run '[ 1 " hello" print ] .'
-#terp.run '[ 1 2 3 ] run .'
-#terp.run '[ 1 ! ] 5 times'
-#terp.run 'false [ 1 ! ] is_true?'
-#terp.run 'true [ 3 ! ] is_true?'
-#terp.run 'false [ 2 ! ] is_false?'
-#terp.run 'true [ 4 ! ] is_false?'
-#terp.run 'false [ 5 ! ] is_false?'
-#terp.run 'false [ 6 ! ] is_false?'
-#terp.run 'true [ 7 ! ] is_false?'
-#terp.run 'true [ 7 ! ] [ 8 ! ] if_else?'
-#terp.run 'false [ 7 ! ] [ 8 ! ] if_else?'
-#terp.run 'true false or [ 9 . ] is_true?'
-#terp.run 'true false and [ 10 . ] is_true?'
-#terp.run 'false not [ 11 . ] is_true?'
-#terp.run '1 [ dup 3 > break? dup print 1 + ] loop'
+terp.run "1 2 3 45 678"
+terp.run "pstack"
+terp.run '" ----------------------" print'
+terp.run '" - dup" print'
+terp.run "dup pstack"
+terp.run '" ----------------------" print'
+terp.run '" - drop" print'
+terp.run "drop pstack"
+terp.run '" ----------------------" print'
+terp.run '" - swap" print'
+terp.run "swap pstack"
+terp.run '" ----------------------" print'
+terp.run '" - over" print'
+terp.run "over pstack"
+terp.run '" ----------------------" print'
+terp.run '" - rot" print'
+terp.run "rot pstack"
+terp.run '" ----------------------" print'
+terp.run "10 pstack"
+terp.run "1 2 3 print print print"
+terp.run "2 2 + print"
+terp.run "2 2 - print"
+terp.run "4 2 / print"
+terp.run "3 3 * 4 4 * + √ print"
+terp.run "var a"
+terp.run "var b"
+terp.run "12 b store"
+terp.run "10 a store"
+terp.run "a fetch print"
+terp.run "b fetch print"
+terp.run "12 a store"
+terp.run "a fetch print"
+terp.run "b fetch print"
+terp.run "5 const Q"
+terp.run "Q print"
+terp.run '" Hello World!" print'
+terp.run '/* abc */ " Hello World!" print'
+terp.run '/* abc */ Q print'
+terp.run 'def HYPOT  dup * swap dup * + √  end'
+terp.run '3 4 hypot .'
+terp.run '[ 1 2 3 ] .'
+terp.run '[ 1 2 3 [ 4 5 6 ] 7 ] .'
+terp.run '[ 1 2 3 [ 4 5 6 ] 7 ] 3 item .'
+terp.run '[ 1 2 3 ] 1 item .'
+terp.run '[ 1 " hello" print ] .'
+terp.run '[ 1 2 3 ] run .'
+terp.run '[ 1 ! ] 5 times'
+terp.run 'false [ 1 ! ] is_true?'
+terp.run 'true [ 3 ! ] is_true?'
+terp.run 'false [ 2 ! ] is_false?'
+terp.run 'true [ 4 ! ] is_false?'
+terp.run 'false [ 5 ! ] is_false?'
+terp.run 'false [ 6 ! ] is_false?'
+terp.run 'true [ 7 ! ] is_false?'
+terp.run 'true [ 7 ! ] [ 8 ! ] if_else?'
+terp.run 'false [ 7 ! ] [ 8 ! ] if_else?'
+terp.run 'true false or [ 9 . ] is_true?'
+terp.run 'true false and [ 10 . ] is_true?'
+terp.run 'false not [ 11 . ] is_true?'
+terp.run '1 [ dup 3 > break? dup print 1 + ] loop'
 #puts terp.dictionary.inspect
