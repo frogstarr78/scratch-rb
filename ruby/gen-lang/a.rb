@@ -130,7 +130,7 @@ class Scratch
     end
   end
 
-  attr_accessor :dictionary, :stack, :buffer, :data_stack, :lexer, :latest
+  attr_accessor :dictionary, :stack, :buffer, :data_stack, :lexer, :latest, :break_state
   IMMEDIATES = %w(VAR CONST " /* DEF END [ TRUE FALSE)
 
   def initialize
@@ -416,7 +416,6 @@ ListWords = {
   end
 }
 
-
 LogicWords = {
   "TRUE" => lambda {|terp| terp.stack << true }, 
   "FALSE" => lambda {|terp| terp.stack << false }, 
@@ -536,15 +535,36 @@ ControlWords = {
     end
   end,
 
-#  "LOOP" => lambda do |terp|
-#    terp.error_if_stack_isnt_sufficient! :<, 1
-#    code = terp.stack.pop
-#
-#    raise Scratch::MissingListExpectation.new(code) unless code.is_a? Array
-#
-#    word = make_word code
-#
-#  end
+  "CONTINUE?" => lambda do |terp|
+    terp.error_if_stack_isnt_sufficient! :<, 1
+    cond = terp.stack.pop
+
+    next if cond
+  end,
+
+  "BREAK?" => lambda do |terp|
+    terp.error_if_stack_isnt_sufficient! :<, 1
+    cond = terp.stack.pop
+
+    if cond
+      terp.break_state = true
+    end
+  end,
+
+  "LOOP" => lambda do |terp|
+    terp.error_if_stack_isnt_sufficient! :<, 1
+    code = terp.stack.pop
+
+    raise Scratch::MissingListExpectation.new(code) unless code.is_a? Array
+
+    word = terp.make_word code
+    old_break_state = terp.break_state
+    terp.break_state = false
+    until terp.break_state
+      word.call terp
+    end
+    terp.break_state = old_break_state
+  end
 }
 
 
@@ -559,6 +579,7 @@ terp.add_words( StackWords )
 terp.add_words( CompilingWords )
 terp.add_words( ListWords )
 terp.add_words( ControlWords )
+terp.add_words( ComparisonWords )
 terp.add_words( LogicWords )
 
 #terp.run "1 2 3 45 678"
@@ -615,8 +636,10 @@ terp.add_words( LogicWords )
 #terp.run 'false [ 5 ! ] is_false?'
 #terp.run 'false [ 6 ! ] is_false?'
 #terp.run 'true [ 7 ! ] is_false?'
-terp.run 'true [ 7 ! ] [ 8 ! ] if_else?'
-terp.run 'false [ 7 ! ] [ 8 ! ] if_else?'
-terp.run 'true false or [ 9 . ] is_true?'
-terp.run 'true false and [ 10 . ] is_true?'
+#terp.run 'true [ 7 ! ] [ 8 ! ] if_else?'
+#terp.run 'false [ 7 ! ] [ 8 ! ] if_else?'
+#terp.run 'true false or [ 9 . ] is_true?'
+#terp.run 'true false and [ 10 . ] is_true?'
+#terp.run 'false not [ 11 . ] is_true?'
+#terp.run '1 [ dup 3 > break? dup print 1 + ] loop'
 #puts terp.dictionary.inspect
