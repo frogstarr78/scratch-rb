@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestStringExt < Test::Unit::TestCase
+class TestStringExt < TestHelper
   context "blank?" do
     should "be true when ''" do
       assert ''.blank?, "'' unexpectedly not blank"

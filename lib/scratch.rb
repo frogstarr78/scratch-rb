@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'generator' 
 require 'core_ext/nil'
 require 'core_ext/string'
@@ -44,42 +46,123 @@ module Scratch
     end
   end
 
+  class StackTooSmall < Exception
+    def initialize items, expected
+      super( "Not enough items on stack:
+      Expected: #{expected.inspect} items but stack is #{items.inspect}"
+           )
+    end
+  end
+
+  class UnexpectedEOI < Exception
+    def message
+      "Unexpected end of input"
+    end
+  end
+
+  class MissingListExpectation < Exception
+    def initialize received
+      super "List expected, received instead '#{received.class}'"
+    end
+  end
+
+  module PrintingWords
+    def print
+      error_if_stack_isnt_sufficient! :empty?
+      Kernel.print stack.pop
+    end
+
+    def puts
+      error_if_stack_isnt_sufficient! :empty?
+      Kernel.puts stack.pop
+    end
+
+    def pstack
+      Kernel.puts stack
+    end
+  end
+
+  module MathWords
+    def math_op op
+      error_if_stack_isnt_sufficient! :<, 2
+      tstack = stack.pop
+      tstack2 = stack.pop
+      stack << tstack2.send( op, tstack )
+    end
+    private :math_op
+
+    def +
+      math_op "+"
+    end
+
+    def -
+      math_op "-"
+    end
+
+    def *
+      math_op "*"
+    end
+
+    def /
+      math_op "/"
+    end
+
+    def RT
+      error_if_stack_isnt_sufficient! :empty?
+      stack << stack.pop ** 0.5
+    end
+  end
+
+  module StackWords
+    def dup 
+      error_if_stack_isnt_sufficient! :<, 1
+      tos = stack.pop
+      stack << tos << tos
+    end
+
+    def drop
+      error_if_stack_isnt_sufficient! :<, 1
+      stack.pop
+    end
+
+    def swap
+      error_if_stack_isnt_sufficient! :<, 2
+      tos = stack.pop
+      _2os = stack.pop
+      stack << tos
+      stack << _2os
+    end
+
+    def over
+      error_if_stack_isnt_sufficient! :<, 2
+      tos = stack.pop
+      _2os = stack.pop
+      stack << _2os
+      stack << tos
+      stack << _2os
+    end
+
+    def rot
+      error_if_stack_isnt_sufficient! :<, 3
+      tos = stack.pop
+      _2os = stack.pop
+      _3os = stack.pop
+      stack << _2os
+      stack << tos
+      stack << _3os
+    end
+  end
+
   class Scratch
-    class StackTooSmall < Exception
-      def initialize items, expected
-        super( "Not enough items on stack:
-        Expected: #{expected.inspect} items but stack is #{items.inspect}"
-             )
-      end
-    end
-
-    class UnexpectedEOI < Exception
-      def message
-        "Unexpected end of input"
-      end
-    end
-
-    class MissingListExpectation < Exception
-      def initialize received
-        super "List expected, received instead '#{received.class}'"
-      end
-    end
-
-    attr_accessor :dictionary, :stack, :buffer, :data_stack, :lexer, :latest, :break_state
+    attr_accessor :stack, :buffer, :data_stack, :lexer, :latest, :break_state
     IMMEDIATES = %w(VAR CONST " /* DEF END [ TRUE FALSE)
+    @@dictionary = []
 
     def initialize
-      @dictionary = {}
       @buffer     = []
       @data_stack = []
       @stack      = @data_stack
       @lexer      = nil
-    end
-
-    def add_words new_dict
-      new_dict.each do |word, callback|
-        dictionary.update word.upcase => callback
-      end
     end
 
     def define_variable word, code
@@ -122,9 +205,8 @@ module Scratch
     end
 
     def compile word
-      word.upcase!
-      if dictionary.has_key?( word )
-        return dictionary[word]
+      if self.respond_to? word
+        return self.method(word.to_sym)
       elsif word.is_numeric?
         return word.to_i
       else
@@ -133,8 +215,8 @@ module Scratch
     end
 
     def interpret word
-      if word.is_a? Proc
-        word.call self
+      if word.is_a? Method
+        word.call
       else
         self.stack << word
       end
@@ -149,95 +231,19 @@ module Scratch
       end
     end
 
-  end
-
-  PrintingWords = {
-    "PRINT" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :empty?
-      print terp.stack.pop
-    end,
-
-    "PUTS" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :empty?
-      puts terp.stack.pop
-    end,
-
-    "PSTACK" => lambda do |terp|
-      puts terp.stack
+    def self.[] mod
+      @@dictionary.select {|modul| modul == mod }
     end
 
-  }
+    def self.| mod
+      include mod
+      @@dictionary << mod
+    end
 
-  math_op = lambda do |terp, op|
-    terp.error_if_stack_isnt_sufficient! :<, 2
-    tstack = terp.stack.pop
-    tstack2 = terp.stack.pop
-    terp.stack << tstack2.send( op, tstack )
+    self | PrintingWords
+    self | MathWords
+    self | StackWords
   end
-
-  MathWords = {
-    "+" => lambda do |terp|
-      math_op.call(terp, "+")
-    end,
-
-    "-" => lambda do |terp|
-      math_op.call(terp, "-")
-    end,
-
-    "*"  => lambda do |terp|
-      math_op.call(terp, "*")
-    end,
-
-    "/" => lambda do |terp|
-      math_op.call(terp, "/")
-    end,
-
-    "√"  => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :empty?
-      tstack = terp.stack.pop
-      terp.stack << tstack ** 0.5
-    end,
-  }
-
-  StackWords = {
-    "DUP" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 1
-      tos = terp.stack.pop
-      terp.stack << tos << tos
-    end,
-
-    "DROP" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 1
-      terp.stack.pop
-    end,
-
-    "SWAP" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 2
-      tos = terp.stack.pop
-      _2os = terp.stack.pop
-      terp.stack << tos
-      terp.stack << _2os
-    end,
-
-    "OVER" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 2
-      tos = terp.stack.pop
-      _2os = terp.stack.pop
-      terp.stack << _2os
-      terp.stack << tos
-      terp.stack << _2os
-    end,
-
-    "ROT" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 3
-      tos = terp.stack.pop
-      _2os = terp.stack.pop
-      _3os = terp.stack.pop
-      terp.stack << _2os
-      terp.stack << tos
-      terp.stack << _3os
-    end,
-  }
 
   VariableWords = {
     "VAR" => lambda do |terp|

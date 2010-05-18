@@ -1,6 +1,6 @@
 require 'helper'
 
-class TestScratch < Test::Unit::TestCase
+class TestScratch < TestHelper
   context "Scratch::Variable" do
     setup do
       @var = Scratch::Variable.new 1
