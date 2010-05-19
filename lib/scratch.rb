@@ -153,6 +153,30 @@ module Scratch
     end
   end
 
+  module VariableWords
+    def var
+      var_name = lexer.next_word
+      raise UnexpectedEOI.new if var_name.nil?
+
+      @var = ::Scratch::Variable.new( 0 )
+      self.class.send :define_method, var_name do
+        self.stack << @var
+      end
+    end
+
+    def store
+      error_if_stack_isnt_sufficient! :<, 2
+      @var = stack.pop
+      @var.value = stack.pop
+    end
+
+    def fetch
+      error_if_stack_isnt_sufficient! :<, 1
+      @var = stack.pop
+      stack << @var.value
+    end
+  end
+
   class Scratch
     attr_accessor :stack, :buffer, :data_stack, :lexer, :latest, :break_state
     IMMEDIATES = %w(VAR CONST " /* DEF END [ TRUE FALSE)
@@ -243,31 +267,8 @@ module Scratch
     self | PrintingWords
     self | MathWords
     self | StackWords
+    self | VariableWords
   end
-
-  VariableWords = {
-    "VAR" => lambda do |terp|
-      var_name = terp.lexer.next_word
-      raise UnexpectedEOI.new if var_name.nil?
-
-      @var = Scratch::Variable.new( 0 )
-      terp.define_variable var_name, lambda{|terp| terp.stack << @var }
-    end,
-
-    "STORE" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 2
-      @var = terp.stack.pop
-      new_val = terp.stack.pop
-      @var.value = new_val
-    end,
-
-    "FETCH" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 1
-      @var = terp.stack.pop
-      terp.stack << @var.value
-    end
-
-  }
 
   ConstantWords = {
     "CONST" => lambda do |terp|
@@ -510,9 +511,6 @@ end
 if $0 == __FILE__
   include Scratch
   terp = Scratch::Scratch.new
-  terp.add_words( PrintingWords )
-  terp.add_words( MathWords )
-  terp.add_words( VariableWords )
   terp.add_words( ConstantWords )
   terp.add_words( StringWords )
   terp.add_words( CommentWords )
