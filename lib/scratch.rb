@@ -177,6 +177,18 @@ module Scratch
     end
   end
 
+  module ConstantWords
+    def const
+      error_if_stack_isnt_sufficient! :<, 1
+
+      const_name = lexer.next_word
+      raise UnexpectedEOI.new if const_name.nil?
+
+      const_value = stack.pop
+      define_variable const_name, lambda {|terp| stack <<  const_value }
+    end
+end
+
   class Scratch
     attr_accessor :stack, :buffer, :data_stack, :lexer, :latest, :break_state
     IMMEDIATES = %w(VAR CONST " /* DEF END [ TRUE FALSE)
@@ -268,19 +280,8 @@ module Scratch
     self | MathWords
     self | StackWords
     self | VariableWords
+    self | ConstantWords
   end
-
-  ConstantWords = {
-    "CONST" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 1
-
-      const_name = terp.lexer.next_word
-      raise UnexpectedEOI.new if const_name.nil?
-
-      const_value = terp.stack.pop
-      terp.define_variable const_name, lambda {|terp| terp.stack <<  const_value }
-    end
-  }
 
   StringWords = {
     '"' => lambda do |terp|
@@ -511,7 +512,6 @@ end
 if $0 == __FILE__
   include Scratch
   terp = Scratch::Scratch.new
-  terp.add_words( ConstantWords )
   terp.add_words( StringWords )
   terp.add_words( CommentWords )
   terp.add_words( StackWords )
