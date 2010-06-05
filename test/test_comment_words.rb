@@ -3,14 +3,14 @@ require 'helper'
 class TestCommentWords < TestHelper
   context 'Scratch::CommentWords' do
     should 'define :/*' do
-      fail
       assert Scratch::CommentWords.instance_methods(false).include?( '/*' )
     end
   end
 
-  context '" method' do
+  context '/* method' do
     should "work" do
-      fail
+      terp.run "4 /* comment here */ 5"
+      assert_equal [4, 5], terp.stack
     end
   end
 end
