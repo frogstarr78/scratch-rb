@@ -60,6 +60,16 @@ module Scratch
     end
   end
 
+  class ConstantReDefine < Exception
+    def initialize constant
+      @constant = constant
+    end
+
+    def message
+      "Unable to redefine constant #{@constant}"
+    end
+  end
+
   class MissingListExpectation < Exception
     def initialize received
       super "List expected, received instead '#{received.class}'"
@@ -159,9 +169,7 @@ module Scratch
       raise UnexpectedEOI.new if var_name.nil?
 
       @var = ::Scratch::Variable.new( 0 )
-      self.class.send :define_method, var_name do
-        self.stack << @var
-      end
+      define_variable(var_name) { stack << @var }
     end
 
     def store
@@ -185,9 +193,13 @@ module Scratch
       raise UnexpectedEOI.new if const_name.nil?
 
       const_value = stack.pop
-      define_variable const_name, lambda {|terp| stack <<  const_value }
+      if respond_to? const_name.to_sym
+        raise ConstantReDefine.new const_name
+      else
+        define_variable(const_name) { const_value }
+      end
     end
-end
+  end
 
   class Scratch
     attr_accessor :stack, :buffer, :data_stack, :lexer, :latest, :break_state
@@ -201,8 +213,8 @@ end
       @lexer      = nil
     end
 
-    def define_variable word, code
-      dictionary.update word.upcase => code
+    def define_variable term, &block
+      self.class.send :define_method, term, &block
     end
 
     def make_word code
@@ -314,7 +326,8 @@ end
     "END" => lambda do |terp|
       code = terp.stack.dup
       terp.stack = []
-      terp.define_variable terp.latest, terp.make_word( code )
+#      terp.define_variable terp.latest, terp.make_word( code )
+      # define_variable laters, make_word(code)
       terp.stop_compiling
     end
   }
