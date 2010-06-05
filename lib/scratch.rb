@@ -207,6 +207,224 @@ module Scratch
     end
   end
 
+  module CommentWords
+    define_method :"/*" do
+      word = lexer.next_word
+      raise UnexpectedEOI.new if word.nil?
+
+      until word[-2, 2] == "*/"
+        raise UnexpectedEOI.new if word.nil?
+        word = lexer.next_word
+      end
+    end
+  end
+
+  module CompilingWords
+    define_method :def do |terp|
+      func_name = terp.lexer.next_word
+      raise UnexpectedEOI.new if func_name.nil?
+
+      terp.latest = func_name
+      terp.start_compiling
+    end
+
+    def end
+      code = terp.stack.dup
+      terp.stack = []
+#      terp.define_variable terp.latest, terp.make_word( code )
+      # define_variable laters, make_word(code)
+      terp.stop_compiling
+    end
+  end
+
+  module ListWords
+    define_method :"[" do |terp|
+      list = []
+      old_stack = terp.stack
+      terp.stack = list
+
+      loop do
+        word = terp.lexer.next_word
+        raise UnexpectedEOI.new if word.nil?
+        break if word == ']'
+
+        token = terp.compile word
+        if Scratch::IMMEDIATES.include? word
+          terp.interpret token
+        else
+          terp.stack << token
+        end
+      end
+
+      terp.stack = old_stack
+      terp.stack << list
+    end
+
+    def length
+      terp.error_if_stack_isnt_sufficient! :<, 1
+      list = terp.stack.pop
+      terp.stack << list.size
+    end
+
+    def item
+      terp.error_if_stack_isnt_sufficient! :<, 2
+
+      index = terp.stack.pop
+      list = terp.stack.pop
+
+      terp.stack.push list[index]
+    end
+  end
+
+  module LogicWords
+#    "TRUE" => lambda {|terp| terp.stack << true }, 
+#    "FALSE" => lambda {|terp| terp.stack << false }, 
+#
+#    "AND" => lambda do |terp|
+#      terp.error_if_stack_isnt_sufficient! :<, 2
+#      term2 = terp.stack.pop
+#      term1 = terp.stack.pop
+#
+#      terp.stack.push term1 && term2
+#    end,
+#
+#    "OR" => lambda do |terp|
+#      terp.error_if_stack_isnt_sufficient! :<, 2
+#      term2 = terp.stack.pop
+#      term1 = terp.stack.pop
+#
+#      terp.stack.push term1 || term2
+#    end,
+#
+#    "NOT" => lambda do |terp|
+#      terp.error_if_stack_isnt_sufficient! :<, 1
+#
+#      terp.stack.push !terp.stack.pop
+#    end
+  end
+
+  module ComparisonWords
+    def comparison_op op
+      terp.error_if_stack_isnt_sufficient! :<, 2
+
+      term2 = terp.stack.pop
+      term1 = terp.stack.pop
+
+      terp.stack.push term1.send op, term2
+    end
+
+#    "<" => lambda do |terp|
+#      comparison_op.call terp, :<
+#    end,
+#
+#    "<=" => lambda do |terp|
+#      comparison_op.call terp, :<=
+#    end,
+#
+#    "==" =>  lambda do |terp|
+#      comparison_op.call terp, :<=
+#    end,
+#
+#    ">=" =>  lambda do |terp|
+#      comparison_op.call terp, :>=
+#    end,
+#
+#    ">" =>  lambda do |terp|
+#      comparison_op.call terp, :>
+#    end
+  end
+
+  module ControlWords
+#    "RUN" => lambda do |terp|
+#      terp.error_if_stack_isnt_sufficient! :<, 1
+#      list = terp.stack.pop
+#      raise Scratch::MissingListExpectation.new(list) unless list.is_a? Array
+#
+#      terp.interpret terp.make_word( list )
+#    end,
+#
+#    "TIMES" => lambda do |terp|
+#      terp.error_if_stack_isnt_sufficient! :<, 2
+#      num_times = terp.stack.pop
+#      list = terp.stack.pop
+#      raise Scratch::MissingListExpectation.new(list) unless list.is_a? Array
+#
+#      word = terp.make_word list
+#      num_times.times do 
+#        word.call terp
+#      end
+#    end,
+#
+#    "IS_TRUE?" => lambda do |terp|
+#      terp.error_if_stack_isnt_sufficient! :<, 2
+#      code = terp.stack.pop
+#      cond = terp.stack.pop
+#
+#      raise Scratch::MissingListExpectation.new(code) unless code.is_a? Array
+#      if cond
+#        terp.interpret terp.make_word(code)
+#      end
+#    end, 
+#
+#    "IS_FALSE?" => lambda do |terp|
+#      terp.error_if_stack_isnt_sufficient! :<, 2
+#      list = terp.stack.pop
+#      cond = terp.stack.pop
+#
+#      raise Scratch::MissingListExpectation.new(list) unless list.is_a? Array
+#      unless cond
+#        terp.interpret terp.make_word(list)
+#      end
+#    end, 
+#
+#    "IF_ELSE?" => lambda do |terp|
+#      terp.error_if_stack_isnt_sufficient! :<, 3
+#      false_code = terp.stack.pop
+#      true_code = terp.stack.pop
+#      cond = terp.stack.pop
+#
+#      raise Scratch::MissingListExpectation.new(true_code) unless true_code.is_a? Array
+#      raise Scratch::MissingListExpectation.new(false_code) unless false_code.is_a? Array
+#
+#      if cond
+#        terp.interpret terp.make_word(true_code)
+#      else
+#        terp.interpret terp.make_word(false_code)
+#      end
+#    end,
+#
+#    "CONTINUE?" => lambda do |terp|
+#      terp.error_if_stack_isnt_sufficient! :<, 1
+#      cond = terp.stack.pop
+#
+#      next if cond
+#    end,
+#
+#    "BREAK?" => lambda do |terp|
+#      terp.error_if_stack_isnt_sufficient! :<, 1
+#      cond = terp.stack.pop
+#
+#      if cond
+#        terp.break_state = true
+#      end
+#    end,
+#
+#    "LOOP" => lambda do |terp|
+#      terp.error_if_stack_isnt_sufficient! :<, 1
+#      code = terp.stack.pop
+#
+#      raise Scratch::MissingListExpectation.new(code) unless code.is_a? Array
+#
+#      word = terp.make_word code
+#      old_break_state = terp.break_state
+#      terp.break_state = false
+#      until terp.break_state
+#        word.call terp
+#      end
+#      terp.break_state = old_break_state
+#    end
+  end
+
   class Scratch
     attr_accessor :stack, :buffer, :data_stack, :lexer, :latest, :break_state
     IMMEDIATES = %w(VAR CONST " /* DEF END [ TRUE FALSE)
@@ -300,226 +518,14 @@ module Scratch
     self < VariableWords
     self < ConstantWords
     self < StringWords
+    self < CommentWords
+    self < CompilingWords
+    self < ListWords
+    self < LogicWords
+    self < ComparisonWords
+    self < ControlWords
   end
 
-  CommentWords = {
-    "/*" => lambda do |terp|
-      word = terp.lexer.next_word
-      raise UnexpectedEOI.new if word.nil?
-
-      until word[-2, 2] == "*/"
-        raise UnexpectedEOI.new if word.nil?
-        word = terp.lexer.next_word
-      end
-    end
-  }
-
-  CompilingWords = {
-    "DEF" => lambda do |terp|
-      func_name = terp.lexer.next_word
-      raise UnexpectedEOI.new if func_name.nil?
-
-      terp.latest = func_name
-      terp.start_compiling
-    end,
-
-    "END" => lambda do |terp|
-      code = terp.stack.dup
-      terp.stack = []
-#      terp.define_variable terp.latest, terp.make_word( code )
-      # define_variable laters, make_word(code)
-      terp.stop_compiling
-    end
-  }
-
-  ListWords = {
-    "[" => lambda do |terp|
-      list = []
-      old_stack = terp.stack
-      terp.stack = list
-
-      loop do
-        word = terp.lexer.next_word
-        raise UnexpectedEOI.new if word.nil?
-        break if word == ']'
-
-        token = terp.compile word
-        if Scratch::IMMEDIATES.include? word
-          terp.interpret token
-        else
-          terp.stack << token
-        end
-      end
-
-      terp.stack = old_stack
-      terp.stack << list
-    end, 
-
-    "LENGTH" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 1
-      list = terp.stack.pop
-      terp.stack << list.size
-    end, 
-
-    "ITEM" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 2
-
-      index = terp.stack.pop
-      list = terp.stack.pop
-
-      terp.stack.push list[index]
-    end
-  }
-
-  LogicWords = {
-    "TRUE" => lambda {|terp| terp.stack << true }, 
-    "FALSE" => lambda {|terp| terp.stack << false }, 
-
-    "AND" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 2
-      term2 = terp.stack.pop
-      term1 = terp.stack.pop
-
-      terp.stack.push term1 && term2
-    end,
-
-    "OR" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 2
-      term2 = terp.stack.pop
-      term1 = terp.stack.pop
-
-      terp.stack.push term1 || term2
-    end,
-
-    "NOT" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 1
-
-      terp.stack.push !terp.stack.pop
-    end
-  }
-
-  comparison_op = lambda do |terp, op|
-    terp.error_if_stack_isnt_sufficient! :<, 2
-
-    term2 = terp.stack.pop
-    term1 = terp.stack.pop
-
-    terp.stack.push term1.send op, term2
-  end
-
-  ComparisonWords = {
-    "<" => lambda do |terp|
-      comparison_op.call terp, :<
-    end,
-
-    "<=" => lambda do |terp|
-      comparison_op.call terp, :<=
-    end,
-
-    "==" =>  lambda do |terp|
-      comparison_op.call terp, :<=
-    end,
-
-    ">=" =>  lambda do |terp|
-      comparison_op.call terp, :>=
-    end,
-
-    ">" =>  lambda do |terp|
-      comparison_op.call terp, :>
-    end
-
-  }
-
-  ControlWords = {
-    "RUN" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 1
-      list = terp.stack.pop
-      raise Scratch::MissingListExpectation.new(list) unless list.is_a? Array
-
-      terp.interpret terp.make_word( list )
-    end,
-
-    "TIMES" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 2
-      num_times = terp.stack.pop
-      list = terp.stack.pop
-      raise Scratch::MissingListExpectation.new(list) unless list.is_a? Array
-
-      word = terp.make_word list
-      num_times.times do 
-        word.call terp
-      end
-    end,
-
-    "IS_TRUE?" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 2
-      code = terp.stack.pop
-      cond = terp.stack.pop
-
-      raise Scratch::MissingListExpectation.new(code) unless code.is_a? Array
-      if cond
-        terp.interpret terp.make_word(code)
-      end
-    end, 
-
-    "IS_FALSE?" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 2
-      list = terp.stack.pop
-      cond = terp.stack.pop
-
-      raise Scratch::MissingListExpectation.new(list) unless list.is_a? Array
-      unless cond
-        terp.interpret terp.make_word(list)
-      end
-    end, 
-
-    "IF_ELSE?" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 3
-      false_code = terp.stack.pop
-      true_code = terp.stack.pop
-      cond = terp.stack.pop
-
-      raise Scratch::MissingListExpectation.new(true_code) unless true_code.is_a? Array
-      raise Scratch::MissingListExpectation.new(false_code) unless false_code.is_a? Array
-
-      if cond
-        terp.interpret terp.make_word(true_code)
-      else
-        terp.interpret terp.make_word(false_code)
-      end
-    end,
-
-    "CONTINUE?" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 1
-      cond = terp.stack.pop
-
-      next if cond
-    end,
-
-    "BREAK?" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 1
-      cond = terp.stack.pop
-
-      if cond
-        terp.break_state = true
-      end
-    end,
-
-    "LOOP" => lambda do |terp|
-      terp.error_if_stack_isnt_sufficient! :<, 1
-      code = terp.stack.pop
-
-      raise Scratch::MissingListExpectation.new(code) unless code.is_a? Array
-
-      word = terp.make_word code
-      old_break_state = terp.break_state
-      terp.break_state = false
-      until terp.break_state
-        word.call terp
-      end
-      terp.break_state = old_break_state
-    end
-  }
 end
 
 if $0 == __FILE__
