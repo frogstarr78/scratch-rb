@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "scratch"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{Ruby port of Felix Pleşoianu's Scratch programming language.}
+    gem.description = %Q{Ruby port of Felix Pleşoianu's Scratch programming language.}
     gem.email = "frogstarr78@gmail.com"
     gem.homepage = "http://github.com/frogstarr78/scratch"
     gem.authors = ["Scott Noel-Hemming"]
