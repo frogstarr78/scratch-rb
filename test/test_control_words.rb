@@ -4,7 +4,7 @@ class TestControlWords < TestHelper
   context 'Scratch::ControlWords' do
     %w(run times is_true? is_false? if_else? continue? break? loop).each do |method|
       should "define :'#{method}'" do
-        assert Scratch::ControlWords.instance_methods(false).include?( '"' )
+        assert Scratch::ControlWords.instance_methods(false).include?( method )
       end
     end
   end

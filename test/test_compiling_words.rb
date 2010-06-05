@@ -4,7 +4,7 @@ class TestCompilingWords < TestHelper
   context 'Scratch::CompilingWords' do
     %w(def end).each do |method|
       should "define '#{method}'" do
-        assert Scratch::CompilingWords.instance_methods(false).include?( 'method' )
+        assert Scratch::CompilingWords.instance_methods(false).include?( method )
       end
     end
   end
