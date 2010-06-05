@@ -201,6 +201,12 @@ module Scratch
     end
   end
 
+  module StringWords
+    define_method :'"' do
+      stack << lexer.next_chars_to( '"' )
+    end
+  end
+
   class Scratch
     attr_accessor :stack, :buffer, :data_stack, :lexer, :latest, :break_state
     IMMEDIATES = %w(VAR CONST " /* DEF END [ TRUE FALSE)
@@ -283,24 +289,18 @@ module Scratch
       @@dictionary.select {|modul| modul == mod }
     end
 
-    def self.| mod
+    def self.< mod
       include mod
       @@dictionary << mod
     end
 
-    self | PrintingWords
-    self | MathWords
-    self | StackWords
-    self | VariableWords
-    self | ConstantWords
+    self < PrintingWords
+    self < MathWords
+    self < StackWords
+    self < VariableWords
+    self < ConstantWords
+    self < StringWords
   end
-
-  StringWords = {
-    '"' => lambda do |terp|
-      word = terp.lexer.next_chars_to('"')
-      terp.stack << word
-    end
-  }
 
   CommentWords = {
     "/*" => lambda do |terp|

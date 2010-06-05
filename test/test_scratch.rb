@@ -15,6 +15,7 @@ class TestScratch < TestHelper
       assert Scratch::Scratch.include?(Scratch::StackWords)
       assert Scratch::Scratch.include?(Scratch::VariableWords)
       assert Scratch::Scratch.include?(Scratch::ConstantWords)
+      assert Scratch::Scratch.include?(Scratch::StringWords)
     end
   end
 end
