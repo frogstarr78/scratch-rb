@@ -240,39 +240,39 @@ module Scratch
   module ListWords
     define_method :"[" do |terp|
       list = []
-      old_stack = terp.stack
-      terp.stack = list
+      old_stack = stack
+      stack = list
 
       loop do
-        word = terp.lexer.next_word
+        word = lexer.next_word
         raise UnexpectedEOI.new if word.nil?
         break if word == ']'
 
-        token = terp.compile word
+        token = compile word
         if Scratch::IMMEDIATES.include? word
-          terp.interpret token
+          interpret token
         else
-          terp.stack << token
+          stack << token
         end
       end
 
-      terp.stack = old_stack
-      terp.stack << list
+      stack = old_stack
+      stack << list
     end
 
     def length
-      terp.error_if_stack_isnt_sufficient! :<, 1
-      list = terp.stack.pop
-      terp.stack << list.size
+      error_if_stack_isnt_sufficient! :<, 1
+      list = stack.pop
+      stack << list.size
     end
 
     def item
-      terp.error_if_stack_isnt_sufficient! :<, 2
+      error_if_stack_isnt_sufficient! :<, 2
 
-      index = terp.stack.pop
-      list = terp.stack.pop
+      index = stack.pop
+      list = stack.pop
 
-      terp.stack.push list[index]
+      stack.push list[index]
     end
   end
 
@@ -341,6 +341,9 @@ module Scratch
   end
 
   module ControlWords
+    def run
+    end
+
 #    "RUN" => lambda do |terp|
 #      terp.error_if_stack_isnt_sufficient! :<, 1
 #      list = terp.stack.pop
@@ -348,7 +351,9 @@ module Scratch
 #
 #      terp.interpret terp.make_word( list )
 #    end,
-#
+
+    def times
+    end
 #    "TIMES" => lambda do |terp|
 #      terp.error_if_stack_isnt_sufficient! :<, 2
 #      num_times = terp.stack.pop
@@ -361,6 +366,8 @@ module Scratch
 #      end
 #    end,
 #
+    def is_true?
+    end
 #    "IS_TRUE?" => lambda do |terp|
 #      terp.error_if_stack_isnt_sufficient! :<, 2
 #      code = terp.stack.pop
@@ -372,6 +379,8 @@ module Scratch
 #      end
 #    end, 
 #
+    def is_false?
+    end
 #    "IS_FALSE?" => lambda do |terp|
 #      terp.error_if_stack_isnt_sufficient! :<, 2
 #      list = terp.stack.pop
@@ -383,6 +392,8 @@ module Scratch
 #      end
 #    end, 
 #
+    def if_else?
+    end
 #    "IF_ELSE?" => lambda do |terp|
 #      terp.error_if_stack_isnt_sufficient! :<, 3
 #      false_code = terp.stack.pop
@@ -399,6 +410,8 @@ module Scratch
 #      end
 #    end,
 #
+    def continue?
+    end
 #    "CONTINUE?" => lambda do |terp|
 #      terp.error_if_stack_isnt_sufficient! :<, 1
 #      cond = terp.stack.pop
@@ -406,6 +419,8 @@ module Scratch
 #      next if cond
 #    end,
 #
+    def break?
+    end
 #    "BREAK?" => lambda do |terp|
 #      terp.error_if_stack_isnt_sufficient! :<, 1
 #      cond = terp.stack.pop
@@ -415,6 +430,8 @@ module Scratch
 #      end
 #    end,
 #
+    def loop
+    end
 #    "LOOP" => lambda do |terp|
 #      terp.error_if_stack_isnt_sufficient! :<, 1
 #      code = terp.stack.pop
