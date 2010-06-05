@@ -277,30 +277,35 @@ module Scratch
   end
 
   module LogicWords
-#    "TRUE" => lambda {|terp| terp.stack << true }, 
-#    "FALSE" => lambda {|terp| terp.stack << false }, 
-#
-#    "AND" => lambda do |terp|
-#      terp.error_if_stack_isnt_sufficient! :<, 2
-#      term2 = terp.stack.pop
-#      term1 = terp.stack.pop
-#
-#      terp.stack.push term1 && term2
-#    end,
-#
-#    "OR" => lambda do |terp|
-#      terp.error_if_stack_isnt_sufficient! :<, 2
-#      term2 = terp.stack.pop
-#      term1 = terp.stack.pop
-#
-#      terp.stack.push term1 || term2
-#    end,
-#
-#    "NOT" => lambda do |terp|
-#      terp.error_if_stack_isnt_sufficient! :<, 1
-#
-#      terp.stack.push !terp.stack.pop
-#    end
+    def true
+      stack << true
+    end
+
+    def false
+      stack << false
+    end
+
+    def or
+      error_if_stack_isnt_sufficient! :<, 2
+      term2 = stack.pop
+      term1 = stack.pop
+
+      stack.push term1 || term2
+    end
+
+    def and
+      error_if_stack_isnt_sufficient! :<, 2
+      term2 = stack.pop
+      term1 = stack.pop
+
+      stack.push term1 && term2
+    end
+
+    def not
+      error_if_stack_isnt_sufficient! :<, 1
+
+      stack.push !stack.pop
+    end
   end
 
   module ComparisonWords
