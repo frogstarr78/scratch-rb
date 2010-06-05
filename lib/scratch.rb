@@ -310,33 +310,34 @@ module Scratch
 
   module ComparisonWords
     def comparison_op op
-      terp.error_if_stack_isnt_sufficient! :<, 2
+      error_if_stack_isnt_sufficient! :<, 2
 
-      term2 = terp.stack.pop
-      term1 = terp.stack.pop
+      term2 = stack.pop
+      term1 = stack.pop
 
-      terp.stack.push term1.send op, term2
+      stack.push term1.send op, term2
+    end
+    private :comparison_op
+
+    def <
+      comparison_op :<
     end
 
-#    "<" => lambda do |terp|
-#      comparison_op.call terp, :<
-#    end,
-#
-#    "<=" => lambda do |terp|
-#      comparison_op.call terp, :<=
-#    end,
-#
-#    "==" =>  lambda do |terp|
-#      comparison_op.call terp, :<=
-#    end,
-#
-#    ">=" =>  lambda do |terp|
-#      comparison_op.call terp, :>=
-#    end,
-#
-#    ">" =>  lambda do |terp|
-#      comparison_op.call terp, :>
-#    end
+    def <=
+      comparison_op :<=
+    end
+
+    def ==
+      comparison_op :==
+    end
+
+    def >=
+      comparison_op :>=
+    end
+
+    def >
+      comparison_op :>
+    end
   end
 
   module ControlWords
