@@ -18,4 +18,10 @@ class TestScratch < TestHelper
       assert Scratch::Scratch.include?(Scratch::StringWords)
     end
   end
+
+  context "import module" do
+    should "be defined" do
+      assert_respond_to Scratch::Scratch, :<
+    end
+  end
 end
