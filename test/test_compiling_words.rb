@@ -7,13 +7,13 @@ class TestCompilingWords < TestHelper
         assert Scratch::CompilingWords.instance_methods(false).include?( method )
       end
     end
-  end
 
-  context 'def method' do
-    should "work" 
-  end
+    context 'def method' do
+      should "work" 
+    end
 
-  context 'end method' do
-    should "work" 
+    context 'end method' do
+      should "work" 
+    end
   end
 end

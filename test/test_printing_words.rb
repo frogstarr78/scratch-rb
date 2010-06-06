@@ -1,10 +1,6 @@
 require 'helper'
 
 class TestPrintingWords < TestHelper
-  def terp 
-    @terp ||= Scratch::Scratch.new
-  end
-
   context 'Scratch::PrintingWords' do
     %w(print puts pstack).each do |meth|
       should "define #{meth}"do

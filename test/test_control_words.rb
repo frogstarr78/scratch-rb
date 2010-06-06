@@ -7,37 +7,37 @@ class TestControlWords < TestHelper
         assert Scratch::ControlWords.instance_methods(false).include?( method )
       end
     end
-  end
 
-  context 'run method' do
-    should "work"
-  end
+    context 'run method' do
+      should "work"
+    end
 
-  context 'times method' do
-    should "work"
-  end
+    context 'times method' do
+      should "work"
+    end
 
-  context 'is_true? method' do
-    should "work"
-  end
+    context 'is_true? method' do
+      should "work"
+    end
 
-  context 'is_false? method' do
-    should "work"
-  end
+    context 'is_false? method' do
+      should "work"
+    end
 
-  context 'if_else? method' do
-    should "work"
-  end
+    context 'if_else? method' do
+      should "work"
+    end
 
-  context 'continue? method' do
-    should "work"
-  end
+    context 'continue? method' do
+      should "work"
+    end
 
-  context 'break? method' do
-    should "work"
-  end
+    context 'break? method' do
+      should "work"
+    end
 
-  context 'loop method' do
-    should "work"
+    context 'loop method' do
+      should "work"
+    end
   end
 end

@@ -5,12 +5,12 @@ class TestStringWords < TestHelper
     should 'define :"' do
       assert Scratch::StringWords.instance_methods(false).include?( '"' )
     end
-  end
 
-  context '" method' do
-    should "work" do
-      terp.run '" hello world"'
-      assert_equal ["hello world"], terp.stack
+    context '" method' do
+      should "work" do
+        terp.run '" hello world"'
+        assert_equal ["hello world"], terp.stack
+      end
     end
   end
 
