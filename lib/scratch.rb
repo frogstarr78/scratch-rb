@@ -345,7 +345,7 @@ module Scratch
   end
 
   module ControlWords
-    def run
+    def exec
     end
 #    "RUN" => lambda do |terp|
 #      terp.error_if_stack_isnt_sufficient! :<, 1
