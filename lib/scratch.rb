@@ -453,6 +453,7 @@ module Scratch
 
   class Scratch
     attr_accessor :stack, :buffer, :data_stack, :lexer, :latest, :break_state
+    private :stack=, :buffer=, :data_stack=, :lexer=, :latest=, :break_state=
     IMMEDIATES = %w(var const " /* def end [ true false)
     @@dictionary = []
 
@@ -476,11 +477,11 @@ module Scratch
     end
 
     def start_compiling
-      self.stack = self.buffer
+      self.stack.__setobj__ self.buffer
     end
 
     def stop_compiling
-      self.stack = self.data_stack
+      self.stack.__setobj__ self.data_stack
     end
 
     def compiling?
@@ -490,7 +491,8 @@ module Scratch
     def run text
       self.lexer = ScratchLexer.new(text)
 
-      while word = lexer.next_word
+      word = lexer.next_word
+      until word.nil?
         token = self.compile word
         if IMMEDIATES.include? word
           self.interpret token
@@ -499,6 +501,7 @@ module Scratch
         else
           self.interpret token
         end
+        word = lexer.next_word
       end
     end
 

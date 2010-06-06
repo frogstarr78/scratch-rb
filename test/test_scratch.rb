@@ -36,6 +36,7 @@ class TestScratch < TestHelper
           terp.interpret terp.method(:true)
         end
 
+        # TODO: Figure out if this is a bug or acceptable
         should "can call external methods" do
           klass = self.method(:class)
           klass.expects :call
@@ -64,6 +65,60 @@ class TestScratch < TestHelper
           assert_raise RuntimeError, "Unknown word 'something_that_is_neither_a_method_name_or_integer'." do
             terp.compile 'something_that_is_neither_a_method_name_or_integer'
           end
+        end
+      end
+
+      context "run" do
+        context "interfacing with the lexer" do
+          setup do
+            @string_to_parse = '3 dup'
+            @mock_lexer = Scratch::ScratchLexer.new @string_to_parse
+          end
+
+          should "initialize a new one" do
+            Scratch::ScratchLexer.expects(:new).with(@string_to_parse).returns @mock_lexer
+            terp.run @string_to_parse
+          end
+
+          should "call next_word" do
+            terp.send :stack=, ['3']
+            terp.send :lexer=, @mock_lexer
+            until_nil_word = sequence('until word.nil?')
+
+            Scratch::ScratchLexer.any_instance.expects(:next_word).in_sequence(until_nil_word).returns '3'
+            Scratch::ScratchLexer.any_instance.expects(:next_word).in_sequence(until_nil_word).returns 'dup'
+            Scratch::ScratchLexer.any_instance.expects(:next_word).in_sequence(until_nil_word).returns nil
+            terp.run @string_to_parse
+          end
+        end
+
+        should "immediately interpret Scratch::IMMEDIATES" do
+          assert Scratch::Scratch::IMMEDIATES.include?( 'false' )
+          terp.expects(:compiling?).returns(true).never
+          # if this doesn't get caught by the IMMEDIATES condition
+          # it should fail because of the compiling? condition
+          terp_false_method = terp.method :false
+          terp.expects(:compile).with('false').returns terp_false_method
+          terp.run 'false'
+          assert_equal [false], terp.stack, "Code didn't follow IMMEDIATES include? conditional as expected"
+          assert_not_equal ['false'], terp.stack, "Code followed compiling? conditional unexpectedly"
+        end
+
+        should "push items onto the buffer if we're compiling" do
+          terp.expects(:compiling?).returns true
+          dup_method = terp.method(:dup)
+          terp.stack.expects(:<<).with dup_method
+          terp.run 'dup'
+        end
+
+        should "interpret tokens that aren't IMMEDIATES when we're not compiling" do
+          assert Scratch::Scratch::IMMEDIATES.include?( 'false' )
+          terp.expects(:compiling?).returns(false)
+          terp.send :stack=, [28]
+          terp_dup_method = terp.method :dup
+          terp.expects(:compile).with('dup').returns terp_dup_method
+          terp_dup_method.expects :call
+          terp.run 'dup'
         end
       end
     end
