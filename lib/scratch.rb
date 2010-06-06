@@ -4,6 +4,7 @@ require 'generator'
 require 'core_ext/nil'
 require 'core_ext/string'
 require 'scratch/variable'
+require 'delegate'
 
 module Scratch
   class ScratchLexer
@@ -238,13 +239,12 @@ module Scratch
   end
 
   module ListWords
-    define_method :"[" do |terp|
+    define_method :"[" do
       list = []
-      old_stack = stack
-      stack = list
+      old_stack = self.stack.__getobj__
+      self.stack.__setobj__ list
 
-      loop do
-        word = lexer.next_word
+      while word = lexer.next_word
         raise UnexpectedEOI.new if word.nil?
         break if word == ']'
 
@@ -252,18 +252,22 @@ module Scratch
         if Scratch::IMMEDIATES.include? word
           interpret token
         else
-          stack << token
+          self.stack << token
         end
       end
+      raise UnexpectedEOI.new unless word == ']'
 
-      stack = old_stack
-      stack << list
+      list = self.stack.__getobj__
+      self.stack.__setobj__ old_stack
+      self.stack << list
+    end
+
+    define_method :"]" do
     end
 
     def length
       error_if_stack_isnt_sufficient! :<, 1
-      list = stack.pop
-      stack << list.size
+      stack << stack.pop.size
     end
 
     def item
@@ -343,7 +347,6 @@ module Scratch
   module ControlWords
     def run
     end
-
 #    "RUN" => lambda do |terp|
 #      terp.error_if_stack_isnt_sufficient! :<, 1
 #      list = terp.stack.pop
@@ -450,13 +453,13 @@ module Scratch
 
   class Scratch
     attr_accessor :stack, :buffer, :data_stack, :lexer, :latest, :break_state
-    IMMEDIATES = %w(VAR CONST " /* DEF END [ TRUE FALSE)
+    IMMEDIATES = %w(var const " /* def end [ true false)
     @@dictionary = []
 
     def initialize
       @buffer     = []
       @data_stack = []
-      @stack      = @data_stack
+      @stack      = SimpleDelegator.new @data_stack
       @lexer      = nil
     end
 
