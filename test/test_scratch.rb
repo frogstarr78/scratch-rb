@@ -121,6 +121,18 @@ class TestScratch < TestHelper
           terp.run 'dup'
         end
       end
+
+      context "make_word" do
+        should "create lambda from supplied list" do
+          code_argument = ['1', "hello", terp.method(:dup), terp.method(:false) ]
+          assert_equal [], terp.stack
+
+          res = terp.make_word code_argument
+          assert_instance_of Proc, res
+          res.call
+          assert_equal ['1', "hello", "hello", false], terp.stack
+        end
+      end
     end
   end
 end
