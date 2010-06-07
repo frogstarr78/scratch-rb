@@ -127,7 +127,7 @@ class TestScratch < TestHelper
           code_argument = ['1', "hello", terp.method(:dup), terp.method(:false) ]
           assert_equal [], terp.stack
 
-          res = terp.make_word code_argument
+          res = terp.send :make_word, code_argument
           assert_instance_of Proc, res
           res.call
           assert_equal ['1', "hello", "hello", false], terp.stack
