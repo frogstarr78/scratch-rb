@@ -229,11 +229,11 @@ module Scratch
     end
 
     def end
-      code = terp.stack.dup
+      code = stack.dup
       stack = []
-#      terp.define_variable terp.latest, terp.make_word( code )
-      # define_variable laters, make_word(code)
+      define_variable latest, &make_word(code)
       stop_compiling
+      self.latest = nil
     end
   end
 

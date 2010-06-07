@@ -9,12 +9,37 @@ class TestCompilingWords < TestHelper
     end
 
     context 'def method' do
-      should "work" 
-      should "raise UnexpectedEOI error when there isn't a function name"
+      should "work" do
+        assert_nil terp.latest
+        assert_equal false, terp.compiling?
+        terp.run 'def cube_root'
+        assert_equal 'cube_root', terp.latest
+        assert_equal true, terp.compiling? 
+      end
+
+      should "raise UnexpectedEOI error when there isn't a function name" do
+        assert_raise Scratch::UnexpectedEOI do
+          terp.run 'def'
+        end
+      end
     end
 
     context 'end method' do
-      should "work" 
+      should "work" do
+        assert_nil terp.latest
+        assert_equal false, terp.compiling?
+        assert !terp.respond_to?(:square)
+        terp.run 'def square dup *'
+        assert_equal 'square', terp.latest
+        assert_equal true, terp.compiling? 
+        terp.run 'end'
+        assert_nil terp.latest
+        assert_respond_to terp, :square
+        assert_equal false, terp.compiling? 
+
+        terp.run '2 square'
+        assert_equal [4], terp.stack
+      end
     end
   end
 end
