@@ -369,6 +369,7 @@ module Scratch
 #      end
 #    end,
 #
+
     def is_true?
     end
 #    "IS_TRUE?" => lambda do |terp|
@@ -382,6 +383,7 @@ module Scratch
 #      end
 #    end, 
 #
+
     def is_false?
     end
 #    "IS_FALSE?" => lambda do |terp|
@@ -394,7 +396,7 @@ module Scratch
 #        terp.interpret terp.make_word(list)
 #      end
 #    end, 
-#
+
     def if_else?
     end
 #    "IF_ELSE?" => lambda do |terp|
@@ -412,7 +414,7 @@ module Scratch
 #        terp.interpret terp.make_word(false_code)
 #      end
 #    end,
-#
+
     def continue?
     end
 #    "CONTINUE?" => lambda do |terp|
@@ -421,7 +423,7 @@ module Scratch
 #
 #      next if cond
 #    end,
-#
+
     def break?
     end
 #    "BREAK?" => lambda do |terp|
@@ -433,6 +435,7 @@ module Scratch
 #      end
 #    end,
 #
+
     def loop
     end
 #    "LOOP" => lambda do |terp|
@@ -469,9 +472,9 @@ module Scratch
     end
 
     def make_word code
-      lambda do |terp|
+      lambda do
         code.each do |word|
-          terp.interpret word
+          interpret word
         end
       end
     end
