@@ -16,8 +16,7 @@ module Scratch
 
     def next_word
       word = nil
-
-      while char = @words.read(1)
+      while char = @words.read( 1 )
         if char.is_whitespace?
           if word.blank?
             next
@@ -192,11 +191,10 @@ module Scratch
       const_name = lexer.next_word
       raise UnexpectedEOI.new if const_name.nil?
 
-      const_value = stack.pop
       if respond_to? const_name.to_sym
         raise ConstantReDefine.new const_name
       else
-        define_variable(const_name) { const_value }
+        define_variable(const_name) { stack.pop }
       end
     end
   end
@@ -349,8 +347,7 @@ module Scratch
       code_list = stack.pop
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
 
-#      interpret make_word( code_list )
-      make_word( code_list ).call
+      interpret make_word( code_list )
     end
 
     def times
@@ -372,8 +369,7 @@ module Scratch
 
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
       if cond
-#        interpret make_word(code_list)
-        make_word(code_list).call
+        interpret make_word( code_list )
       end
     end
 
@@ -384,8 +380,7 @@ module Scratch
 
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
       unless cond
-#        interpret make_word(code_list)
-        make_word(code_list).call
+        interpret make_word( code_list )
       end
     end
 
@@ -399,11 +394,9 @@ module Scratch
       raise MissingListExpectation.new(false_code) unless false_code.is_a? Array
 
       if cond
-#        interpret make_word(true_code)
-        make_word(true_code).call
+        interpret make_word( true_code )
       else
-#        terp.interpret terp.make_word(false_code)
-        make_word(false_code).call
+        interpret make_word( false_code )
       end
     end
 
@@ -457,14 +450,17 @@ module Scratch
         end
       end
     end
+    private :make_word
 
     def start_compiling
       self.stack = self.buffer
     end
+    private :start_compiling
 
     def stop_compiling
       self.stack = self.data_stack
     end
+    private :stop_compiling
 
     def compiling?
       self.stack.object_id == self.buffer.object_id
@@ -498,7 +494,7 @@ module Scratch
     end
 
     def interpret word
-      if word.is_a? Method
+      if ( word.is_a? Method and respond_to? word.name ) or word.is_a? Proc
         word.call
       else
         self.stack << word
@@ -513,14 +509,19 @@ module Scratch
         raise StackTooSmall.new stack, check if self.stack.size < check 
       end
     end
+    private :error_if_stack_isnt_sufficient!
 
-    def self.[] mod
-      @@dictionary.select {|modul| modul == mod }
-    end
+    class << self
+      def [] mod
+        @@dictionary.select {|modul| modul == mod }
+      end
+      private :[]
 
-    def self.< mod
-      include mod
-      @@dictionary << mod
+      def < mod
+        include mod
+        @@dictionary << mod
+      end
+#      private :<
     end
 
     self < PrintingWords
