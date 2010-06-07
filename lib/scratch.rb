@@ -4,7 +4,6 @@ require 'generator'
 require 'core_ext/nil'
 require 'core_ext/string'
 require 'scratch/variable'
-require 'delegate'
 
 module Scratch
   class ScratchLexer
@@ -221,28 +220,28 @@ module Scratch
   end
 
   module CompilingWords
-    define_method :def do |terp|
-      func_name = terp.lexer.next_word
+    define_method :def do
+      func_name = lexer.next_word
       raise UnexpectedEOI.new if func_name.nil?
 
-      terp.latest = func_name
-      terp.start_compiling
+      self.latest = func_name
+      start_compiling
     end
 
     def end
       code = terp.stack.dup
-      terp.stack = []
+      stack = []
 #      terp.define_variable terp.latest, terp.make_word( code )
       # define_variable laters, make_word(code)
-      terp.stop_compiling
+      stop_compiling
     end
   end
 
   module ListWords
     define_method :"[" do
       list = []
-      old_stack = self.stack.__getobj__
-      self.stack.__setobj__ list
+      old_stack = self.stack
+      self.stack = list
 
       while word = lexer.next_word
         raise UnexpectedEOI.new if word.nil?
@@ -257,8 +256,8 @@ module Scratch
       end
       raise UnexpectedEOI.new unless word == ']'
 
-      list = self.stack.__getobj__
-      self.stack.__setobj__ old_stack
+      list = self.stack
+      self.stack = old_stack
       self.stack << list
     end
 
@@ -463,7 +462,7 @@ module Scratch
     def initialize
       @buffer     = []
       @data_stack = []
-      @stack      = SimpleDelegator.new @data_stack
+      @stack      = @data_stack
       @lexer      = nil
     end
 
@@ -480,11 +479,11 @@ module Scratch
     end
 
     def start_compiling
-      self.stack.__setobj__ self.buffer
+      self.stack = self.buffer
     end
 
     def stop_compiling
-      self.stack.__setobj__ self.data_stack
+      self.stack = self.data_stack
     end
 
     def compiling?
