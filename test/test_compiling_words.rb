@@ -10,6 +10,7 @@ class TestCompilingWords < TestHelper
 
     context 'def method' do
       should "work" 
+      should "raise UnexpectedEOI error when there isn't a function name"
     end
 
     context 'end method' do
