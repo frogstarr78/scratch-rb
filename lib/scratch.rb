@@ -94,7 +94,7 @@ module Scratch
 
   module MathWords
     def math_op op
-      error_if_stack_isnt_sufficient! :<, 2
+      error_if_stack_isnt_sufficient! 2
       tstack = stack.pop
       tstack2 = stack.pop
       stack << tstack2.send( op, tstack )
@@ -125,18 +125,18 @@ module Scratch
 
   module StackWords
     def dup 
-      error_if_stack_isnt_sufficient! :<, 1
+      error_if_stack_isnt_sufficient! 1
       tos = stack.pop
       stack << tos << tos
     end
 
     def drop
-      error_if_stack_isnt_sufficient! :<, 1
+      error_if_stack_isnt_sufficient! 1
       stack.pop
     end
 
     def swap
-      error_if_stack_isnt_sufficient! :<, 2
+      error_if_stack_isnt_sufficient! 2
       tos = stack.pop
       _2os = stack.pop
       stack << tos
@@ -144,7 +144,7 @@ module Scratch
     end
 
     def over
-      error_if_stack_isnt_sufficient! :<, 2
+      error_if_stack_isnt_sufficient! 2
       tos = stack.pop
       _2os = stack.pop
       stack << _2os
@@ -153,7 +153,7 @@ module Scratch
     end
 
     def rot
-      error_if_stack_isnt_sufficient! :<, 3
+      error_if_stack_isnt_sufficient! 3
       tos = stack.pop
       _2os = stack.pop
       _3os = stack.pop
@@ -173,13 +173,13 @@ module Scratch
     end
 
     def store
-      error_if_stack_isnt_sufficient! :<, 2
+      error_if_stack_isnt_sufficient! 2
       @var = stack.pop
       @var.value = stack.pop
     end
 
     def fetch
-      error_if_stack_isnt_sufficient! :<, 1
+      error_if_stack_isnt_sufficient! 1
       @var = stack.pop
       stack << @var.value
     end
@@ -187,7 +187,7 @@ module Scratch
 
   module ConstantWords
     def const
-      error_if_stack_isnt_sufficient! :<, 1
+      error_if_stack_isnt_sufficient! 1
 
       const_name = lexer.next_word
       raise UnexpectedEOI.new if const_name.nil?
@@ -265,12 +265,12 @@ module Scratch
     end
 
     def length
-      error_if_stack_isnt_sufficient! :<, 1
+      error_if_stack_isnt_sufficient! 1
       stack << stack.pop.size
     end
 
     def item
-      error_if_stack_isnt_sufficient! :<, 2
+      error_if_stack_isnt_sufficient! 2
 
       index = stack.pop
       list = stack.pop
@@ -289,7 +289,7 @@ module Scratch
     end
 
     def or
-      error_if_stack_isnt_sufficient! :<, 2
+      error_if_stack_isnt_sufficient! 2
       term2 = stack.pop
       term1 = stack.pop
 
@@ -297,7 +297,7 @@ module Scratch
     end
 
     def and
-      error_if_stack_isnt_sufficient! :<, 2
+      error_if_stack_isnt_sufficient! 2
       term2 = stack.pop
       term1 = stack.pop
 
@@ -305,7 +305,7 @@ module Scratch
     end
 
     def not
-      error_if_stack_isnt_sufficient! :<, 1
+      error_if_stack_isnt_sufficient! 1
 
       stack.push !stack.pop
     end
@@ -313,7 +313,7 @@ module Scratch
 
   module ComparisonWords
     def comparison_op op
-      error_if_stack_isnt_sufficient! :<, 2
+      error_if_stack_isnt_sufficient! 2
 
       term2 = stack.pop
       term1 = stack.pop
@@ -345,112 +345,91 @@ module Scratch
 
   module ControlWords
     def exec
+      error_if_stack_isnt_sufficient! 1
+      code_list = stack.pop
+      raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
+
+#      interpret make_word( code_list )
+      make_word( code_list ).call
     end
-#    "RUN" => lambda do |terp|
-#      terp.error_if_stack_isnt_sufficient! :<, 1
-#      list = terp.stack.pop
-#      raise Scratch::MissingListExpectation.new(list) unless list.is_a? Array
-#
-#      terp.interpret terp.make_word( list )
-#    end,
 
     def times
+      error_if_stack_isnt_sufficient! 2
+      num_times = stack.pop
+      code_list = stack.pop
+      raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
+
+      word = make_word code_list
+      num_times.times do 
+        word.call
+      end
     end
-#    "TIMES" => lambda do |terp|
-#      terp.error_if_stack_isnt_sufficient! :<, 2
-#      num_times = terp.stack.pop
-#      list = terp.stack.pop
-#      raise Scratch::MissingListExpectation.new(list) unless list.is_a? Array
-#
-#      word = terp.make_word list
-#      num_times.times do 
-#        word.call terp
-#      end
-#    end,
-#
 
     def is_true?
+      error_if_stack_isnt_sufficient! 2
+      code_list = stack.pop
+      cond = stack.pop
+
+      raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
+      if cond
+#        interpret make_word(code_list)
+        make_word(code_list).call
+      end
     end
-#    "IS_TRUE?" => lambda do |terp|
-#      terp.error_if_stack_isnt_sufficient! :<, 2
-#      code = terp.stack.pop
-#      cond = terp.stack.pop
-#
-#      raise Scratch::MissingListExpectation.new(code) unless code.is_a? Array
-#      if cond
-#        terp.interpret terp.make_word(code)
-#      end
-#    end, 
-#
 
     def is_false?
+      error_if_stack_isnt_sufficient! 2
+      code_list = stack.pop
+      cond = stack.pop
+
+      raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
+      unless cond
+#        interpret make_word(code_list)
+        make_word(code_list).call
+      end
     end
-#    "IS_FALSE?" => lambda do |terp|
-#      terp.error_if_stack_isnt_sufficient! :<, 2
-#      list = terp.stack.pop
-#      cond = terp.stack.pop
-#
-#      raise Scratch::MissingListExpectation.new(list) unless list.is_a? Array
-#      unless cond
-#        terp.interpret terp.make_word(list)
-#      end
-#    end, 
 
     def if_else?
-    end
-#    "IF_ELSE?" => lambda do |terp|
-#      terp.error_if_stack_isnt_sufficient! :<, 3
-#      false_code = terp.stack.pop
-#      true_code = terp.stack.pop
-#      cond = terp.stack.pop
-#
-#      raise Scratch::MissingListExpectation.new(true_code) unless true_code.is_a? Array
-#      raise Scratch::MissingListExpectation.new(false_code) unless false_code.is_a? Array
-#
-#      if cond
-#        terp.interpret terp.make_word(true_code)
-#      else
-#        terp.interpret terp.make_word(false_code)
-#      end
-#    end,
+      error_if_stack_isnt_sufficient! 3
+      false_code = stack.pop
+      true_code = stack.pop
+      cond = stack.pop
 
-    def continue?
+      raise MissingListExpectation.new(true_code) unless true_code.is_a? Array
+      raise MissingListExpectation.new(false_code) unless false_code.is_a? Array
+
+      if cond
+#        interpret make_word(true_code)
+        make_word(true_code).call
+      else
+#        terp.interpret terp.make_word(false_code)
+        make_word(false_code).call
+      end
     end
-#    "CONTINUE?" => lambda do |terp|
-#      terp.error_if_stack_isnt_sufficient! :<, 1
-#      cond = terp.stack.pop
-#
-#      next if cond
-#    end,
+
+#    def continue?
+#      error_if_stack_isnt_sufficient! 1
+##      next if stack.pop
+#    end
 
     def break?
+      error_if_stack_isnt_sufficient! 1
+      self.break_state = true if stack.pop
     end
-#    "BREAK?" => lambda do |terp|
-#      terp.error_if_stack_isnt_sufficient! :<, 1
-#      cond = terp.stack.pop
-#
-#      if cond
-#        terp.break_state = true
-#      end
-#    end,
-#
 
     def loop
+      error_if_stack_isnt_sufficient! 1
+      code_list = stack.pop
+      raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
+
+      word = make_word code_list
+      old_break_state = break_state
+      break_state = false
+      until self.break_state
+        word.call
+      end
+      break_state = old_break_state
     end
-#    "LOOP" => lambda do |terp|
-#      terp.error_if_stack_isnt_sufficient! :<, 1
-#      code = terp.stack.pop
-#
-#      raise Scratch::MissingListExpectation.new(code) unless code.is_a? Array
-#
-#      word = terp.make_word code
-#      old_break_state = terp.break_state
-#      terp.break_state = false
-#      until terp.break_state
-#        word.call terp
-#      end
-#      terp.break_state = old_break_state
-#    end
   end
 
   class Scratch
@@ -460,10 +439,11 @@ module Scratch
     @@dictionary = []
 
     def initialize
-      @buffer     = []
-      @data_stack = []
-      @stack      = @data_stack
-      @lexer      = nil
+      @buffer      = []
+      @data_stack  = []
+      @stack       = @data_stack
+      @lexer       = nil
+      @break_state = false
     end
 
     def define_variable term, &block
@@ -525,12 +505,12 @@ module Scratch
       end
     end
 
-    def error_if_stack_isnt_sufficient! check, arg = nil
+    def error_if_stack_isnt_sufficient! check
       case check
       when :empty?
         raise StackTooSmall.new stack, '> 0' if self.stack.empty? 
-      when :<
-        raise StackTooSmall.new stack, arg if self.stack.size < arg 
+      when Fixnum
+        raise StackTooSmall.new stack, check if self.stack.size < check 
       end
     end
 
