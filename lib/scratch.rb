@@ -16,7 +16,8 @@ module Scratch
 
     def next_word
       word = nil
-      while char = @words.read( 1 )
+      char = @words.read( 1 )
+      while char
         if char.is_whitespace?
           if word.blank?
             next
@@ -27,19 +28,22 @@ module Scratch
           word ||= ''
           word << char
         end
+        char = @words.read( 1 )
       end
       word
     end
 
     def next_chars_to up_tochar
       word = nil
-      while char = @words.read( 1 )
+      char = @words.read( 1 )
+      while char
         if char == up_tochar
           return word
         else
           word ||= ''
           word << char
         end
+        char = @words.read( 1 )
       end
       word
     end
@@ -94,8 +98,7 @@ module Scratch
   module MathWords
     def math_op op
       error_if_stack_isnt_sufficient! 2
-      tstack = stack.pop
-      tstack2 = stack.pop
+      tstack2, tstack = stack.pop 2
       stack << tstack2.send( op, tstack )
     end
     private :math_op
@@ -116,7 +119,7 @@ module Scratch
       math_op "/"
     end
 
-    def RT
+    def rt
       error_if_stack_isnt_sufficient! :empty?
       stack << stack.pop ** 0.5
     end
@@ -136,16 +139,14 @@ module Scratch
 
     def swap
       error_if_stack_isnt_sufficient! 2
-      tos = stack.pop
-      _2os = stack.pop
+      _2os, tos = stack.pop 2
       stack << tos
       stack << _2os
     end
 
     def over
       error_if_stack_isnt_sufficient! 2
-      tos = stack.pop
-      _2os = stack.pop
+      _2os, tos = stack.pop 2
       stack << _2os
       stack << tos
       stack << _2os
@@ -153,9 +154,7 @@ module Scratch
 
     def rot
       error_if_stack_isnt_sufficient! 3
-      tos = stack.pop
-      _2os = stack.pop
-      _3os = stack.pop
+      _3os, _2os, tos = stack.pop 3
       stack << _2os
       stack << tos
       stack << _3os
@@ -241,7 +240,8 @@ module Scratch
       old_stack = self.stack
       self.stack = list
 
-      while word = lexer.next_word
+      word = lexer.next_word
+      while word
         raise UnexpectedEOI.new if word.nil?
         break if word == ']'
 
@@ -251,6 +251,7 @@ module Scratch
         else
           self.stack << token
         end
+        word = lexer.next_word
       end
       raise UnexpectedEOI.new unless word == ']'
 
@@ -270,8 +271,7 @@ module Scratch
     def item
       error_if_stack_isnt_sufficient! 2
 
-      index = stack.pop
-      list = stack.pop
+      list, index = stack.pop 2
 
       stack.push list[index]
     end
@@ -288,18 +288,16 @@ module Scratch
 
     def or
       error_if_stack_isnt_sufficient! 2
-      term2 = stack.pop
-      term1 = stack.pop
 
-      stack.push term1 || term2
+      left_term, right_term = stack.pop 2
+      stack.push left_term || right_term
     end
 
     def and
       error_if_stack_isnt_sufficient! 2
-      term2 = stack.pop
-      term1 = stack.pop
 
-      stack.push term1 && term2
+      left_term, right_term = stack.pop 2
+      stack.push left_term && right_term
     end
 
     def not
@@ -313,10 +311,8 @@ module Scratch
     def comparison_op op
       error_if_stack_isnt_sufficient! 2
 
-      term2 = stack.pop
-      term1 = stack.pop
-
-      stack.push term1.send op, term2
+      left_term, right_term = stack.pop 2
+      stack.push left_term.send op, right_term
     end
     private :comparison_op
 
@@ -352,8 +348,7 @@ module Scratch
 
     def times
       error_if_stack_isnt_sufficient! 2
-      num_times = stack.pop
-      code_list = stack.pop
+      code_list, num_times = stack.pop 2
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
 
       word = make_word code_list
@@ -364,8 +359,7 @@ module Scratch
 
     def is_true?
       error_if_stack_isnt_sufficient! 2
-      code_list = stack.pop
-      cond = stack.pop
+      cond, code_list = stack.pop 2
 
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
       if cond
@@ -375,8 +369,7 @@ module Scratch
 
     def is_false?
       error_if_stack_isnt_sufficient! 2
-      code_list = stack.pop
-      cond = stack.pop
+      cond, code_list = stack.pop 2
 
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
       unless cond
@@ -386,9 +379,7 @@ module Scratch
 
     def if_else?
       error_if_stack_isnt_sufficient! 3
-      false_code = stack.pop
-      true_code = stack.pop
-      cond = stack.pop
+      cond, true_code, false_code = stack.pop 3
 
       raise MissingListExpectation.new(true_code) unless true_code.is_a? Array
       raise MissingListExpectation.new(false_code) unless false_code.is_a? Array
@@ -537,7 +528,6 @@ module Scratch
     self < ComparisonWords
     self < ControlWords
   end
-
 end
 
 if $0 == __FILE__
