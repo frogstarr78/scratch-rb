@@ -12,13 +12,13 @@ class TestMathWords < TestHelper
     context "dup method" do
       should "works" do
         terp.run '0 1'
-        assert_equal [0, 1], terp.stack
+        assert_equal_stack [0, 1], terp.stack
         terp.run "dup"
-        assert_equal [0, 1, 1], terp.stack
+        assert_equal_stack [0, 1, 1], terp.stack
       end
 
       should "raise StackTooSmall error when called with an empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "dup"
         end
@@ -28,13 +28,13 @@ class TestMathWords < TestHelper
     context "drop method" do
       should "works" do
         terp.run '2 3'
-        assert_equal [2, 3], terp.stack
+        assert_equal_stack [2, 3], terp.stack
         terp.run "drop"
-        assert_equal [2], terp.stack
+        assert_equal_stack [2], terp.stack
       end
 
       should "raise StackTooSmall error when called with an empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "drop"
         end
@@ -44,13 +44,13 @@ class TestMathWords < TestHelper
     context "swap method" do
       should "works" do
         terp.run '4 3'
-        assert_equal [4, 3], terp.stack
+        assert_equal_stack [4, 3], terp.stack
         terp.run "swap"
-        assert_equal [3, 4], terp.stack
+        assert_equal_stack [3, 4], terp.stack
       end
 
       should "raise StackTooSmall error when called with an empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "swap"
         end
@@ -58,7 +58,7 @@ class TestMathWords < TestHelper
 
       should "raise StackTooSmall error when called with stack size of 1" do
         terp.run '3'
-        assert_equal [3], terp.stack
+        assert_equal_stack [3], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "swap"
         end
@@ -68,13 +68,13 @@ class TestMathWords < TestHelper
     context "over method" do
       should "works" do
         terp.run '5 4'
-        assert_equal [5, 4], terp.stack
+        assert_equal_stack [5, 4], terp.stack
         terp.run "over"
-        assert_equal [5, 4, 5], terp.stack
+        assert_equal_stack [5, 4, 5], terp.stack
       end
 
       should "raise StackTooSmall error when called with an empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "over"
         end
@@ -82,7 +82,7 @@ class TestMathWords < TestHelper
 
       should "raise StackTooSmall error when called with stack size of 1" do
         terp.run '3'
-        assert_equal [3], terp.stack
+        assert_equal_stack [3], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "over"
         end
@@ -92,13 +92,13 @@ class TestMathWords < TestHelper
     context "rot method" do
       should "works" do
         terp.run '6 4 5'
-        assert_equal [6, 4, 5], terp.stack
+        assert_equal_stack [6, 4, 5], terp.stack
         terp.run "rot"
-        assert_equal [4, 5, 6], terp.stack
+        assert_equal_stack [4, 5, 6], terp.stack
       end
 
       should "raise StackTooSmall error when called with an empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "rot"
         end
@@ -106,7 +106,7 @@ class TestMathWords < TestHelper
 
       should "raise StackTooSmall error when called with stack size of 1" do
         terp.run '3'
-        assert_equal [3], terp.stack
+        assert_equal_stack [3], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "rot"
         end
@@ -114,7 +114,7 @@ class TestMathWords < TestHelper
 
       should "raise StackTooSmall error when called with stack size of 2" do
         terp.run '3 2'
-        assert_equal [3, 2], terp.stack
+        assert_equal_stack [3, 2], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "rot"
         end

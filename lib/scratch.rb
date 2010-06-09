@@ -18,18 +18,24 @@ require 'scratch/list_words'
 require 'scratch/logic_words'
 require 'scratch/comparison_words'
 require 'scratch/control_words'
+require 'scratch/stack'
 
 module Scratch
   class Scratch
-    attr_accessor :stack, :buffer, :data_stack, :lexer, :latest, :break_state
-    private :stack=, :buffer=, :data_stack=, :lexer=, :latest=, :break_state=
+#    attr_accessor :stack, :buffer, :data_stack, :lexer, :latest, :break_state
+#    private :stack=, :buffer=, :data_stack=, :lexer=, :latest=, :break_state=
+    attr_accessor :lexer, :latest, :break_state
+    attr_reader :stack
+    # TODO: See about making Scratch::Stack do all the stack temporary re-assignments.
+    attr_writer :stack
+    private  :lexer=, :latest=, :break_state=
     IMMEDIATES = %w(var const " /* def end [ true false)
-#    @@dictionary = []
 
     def initialize
-      @buffer      = []
-      @data_stack  = []
-      @stack       = @data_stack
+#      @buffer      = []
+#      @data_stack  = []
+      @stack       = Stack.new
+#      @stack       = @data_stack
       @lexer       = nil
       @break_state = false
     end
@@ -47,20 +53,6 @@ module Scratch
     end
     private :make_word
 
-    def start_compiling
-      self.stack = self.buffer
-    end
-    private :start_compiling
-
-    def stop_compiling
-      self.stack = self.data_stack
-    end
-    private :stop_compiling
-
-    def compiling?
-      self.stack.object_id == self.buffer.object_id
-    end
-
     def run text
       self.lexer = ScratchLexer.new(text)
 
@@ -69,7 +61,7 @@ module Scratch
         token = self.compile word
         if IMMEDIATES.include? word
           self.interpret token
-        elsif self.compiling?
+        elsif self.stack.compiling?
           self << token
         else
           self.interpret token
@@ -105,19 +97,6 @@ module Scratch
       self.stack << thing
     end
 #    private :<<
-
-#    class << self
-#      def [] mod
-#        @@dictionary.select {|modul| modul == mod }
-#      end
-#      private :[]
-#
-#      def < mod
-#        include mod
-#        @@dictionary << mod
-#      end
-##      private :<
-#    end
 
     include PrintingWords
     include MathWords

@@ -9,7 +9,7 @@ class TestCommentWords < TestHelper
     context '/* method' do
       should "work" do
         terp.run "4 /* comment here */ 5"
-        assert_equal [4, 5], terp.stack
+        assert_equal_stack [4, 5], terp.stack
       end
     end
   end

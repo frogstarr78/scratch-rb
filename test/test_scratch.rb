@@ -4,7 +4,7 @@ class TestScratch < TestHelper
   context "stack" do
     should "add literals to stack" do
       terp.run '1 2 3'
-      assert_equal [1, 2, 3], terp.stack
+      assert_equal_stack [1, 2, 3], terp.stack
     end
 
     context "Scratch::Scratch" do
@@ -81,7 +81,7 @@ class TestScratch < TestHelper
           end
 
           should "call next_word" do
-            terp.send :stack=, ['3']
+            terp.run '3'
             terp.send :lexer=, @mock_lexer
             until_nil_word = sequence('until word.nil?')
 
@@ -100,21 +100,21 @@ class TestScratch < TestHelper
           terp_false_method = terp.method :false
           terp.expects(:compile).with('false').returns terp_false_method
           terp.run 'false'
-          assert_equal [false], terp.stack, "Code didn't follow IMMEDIATES include? conditional as expected"
+          assert_equal_stack [false], terp.stack, "Code didn't follow IMMEDIATES include? conditional as expected"
           assert_not_equal ['false'], terp.stack, "Code followed compiling? conditional unexpectedly"
         end
 
         should "push items onto the buffer if we're compiling" do
-          terp.expects(:compiling?).returns true
+          terp.stack.expects(:compiling?).returns true
           dup_method = terp.method(:dup)
           terp.stack.expects(:<<).with dup_method
           terp.run 'dup'
         end
 
         should "interpret tokens that aren't IMMEDIATES when we're not compiling" do
+          terp.run '28'
           assert Scratch::Scratch::IMMEDIATES.include?( 'false' )
-          terp.expects(:compiling?).returns(false)
-          terp.send :stack=, [28]
+          terp.stack.expects(:compiling?).returns(false)
           terp_dup_method = terp.method :dup
           terp.expects(:compile).with('dup').returns terp_dup_method
           terp_dup_method.expects :call
@@ -125,12 +125,12 @@ class TestScratch < TestHelper
       context "make_word" do
         should "create lambda from supplied list" do
           code_argument = ['1', "hello", terp.method(:dup), terp.method(:false) ]
-          assert_equal [], terp.stack
+          assert_equal_stack [], terp.stack
 
           res = terp.send :make_word, code_argument
           assert_instance_of Proc, res
           res.call
-          assert_equal ['1', "hello", "hello", false], terp.stack
+          assert_equal_stack ['1', "hello", "hello", false], terp.stack
         end
       end
     end

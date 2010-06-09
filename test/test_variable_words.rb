@@ -1,7 +1,6 @@
 require 'helper'
 
 class TestVariableWords < TestHelper
-
   context 'Scratch::VariableWords' do
     %w(var store fetch).each do |meth|
       should "define #{meth}"do
@@ -13,14 +12,14 @@ class TestVariableWords < TestHelper
       should "initializes a variable" do
         assert !terp.respond_to?( :a )
         terp.run 'var a'
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_respond_to terp, :a
         terp.a
         assert_instance_of Scratch::Variable, terp.stack.pop
       end
 
       should "raise UnexpectedEOI error when called with an empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::UnexpectedEOI do
           terp.run "var"
         end
@@ -38,7 +37,7 @@ class TestVariableWords < TestHelper
 
       should "raise StackTooSmall error when called with an empty stack" do
         terp.run 'var c'
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "store"
         end
@@ -46,7 +45,7 @@ class TestVariableWords < TestHelper
 
       should "raise StackTooSmall error when called with stack size of 1" do
         terp.run 'var d'
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "d store"
         end
@@ -59,13 +58,13 @@ class TestVariableWords < TestHelper
         terp.run 'var e'
         terp.run '1 e store'
         terp.run 'e fetch'
-        assert_equal [1], terp.stack
+        assert_equal_stack [1], terp.stack
       end
 
       should "raise StackTooSmall error when called with an empty stack" do
         terp.run 'var f'
         terp.run '1 f store'
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_respond_to terp, :f
         assert_raise Scratch::StackTooSmall do
           terp.run "fetch"

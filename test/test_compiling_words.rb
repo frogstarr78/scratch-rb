@@ -38,7 +38,7 @@ class TestCompilingWords < TestHelper
         assert_equal false, terp.compiling? 
 
         terp.run '2 square'
-        assert_equal [4], terp.stack
+        assert_equal_stack [4], terp.stack
       end
     end
   end

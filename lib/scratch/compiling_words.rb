@@ -5,14 +5,14 @@ module Scratch
       raise UnexpectedEOI.new if func_name.nil?
 
       self.latest = func_name
-      start_compiling
+      self.stack.start_compiling!
     end
 
     def end
       code = stack.dup
       stack = []
       define_variable latest, &make_word(code)
-      stop_compiling
+      self.stack.stop_compiling!
       self.latest = nil
     end
   end

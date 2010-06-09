@@ -9,7 +9,7 @@ class TestStringWords < TestHelper
     context '" method' do
       should "work" do
         terp.run '" hello world"'
-        assert_equal ["hello world"], terp.stack
+        assert_equal_stack ["hello world"], terp.stack
       end
     end
   end

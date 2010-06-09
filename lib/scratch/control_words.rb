@@ -41,7 +41,7 @@ module Scratch
 
     def if_else?
       error_if_stack_isnt! 3
-      cond, true_code, false_code = stack.pop 3
+      cond, true_code, false_code = self.stack.pop 3
 
       raise MissingListExpectation.new(true_code) unless true_code.is_a? Array
       raise MissingListExpectation.new(false_code) unless false_code.is_a? Array

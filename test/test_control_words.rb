@@ -12,7 +12,7 @@ class TestControlWords < TestHelper
     context 'exec method' do
       should "work" do
         terp.run '[ 2 3 + ] exec'
-        assert_equal [5], terp.stack
+        assert_equal_stack [5], terp.stack
       end
 
       should "raise StackTooSmall error when called with empty stack" do
@@ -30,7 +30,7 @@ class TestControlWords < TestHelper
     context 'times method' do
       should "work" do
         terp.run '[ 2 3 + ] 5 times'
-        assert_equal [5, 5, 5, 5, 5], terp.stack
+        assert_equal_stack [5, 5, 5, 5, 5], terp.stack
       end
 
       should "raise StackTooSmall error when called with empty stack" do
@@ -39,20 +39,20 @@ class TestControlWords < TestHelper
         end
       end
       should "raise StackTooSmall error when called with one element in the stack" do
-        terp.send :stack=, [[3, 2, terp.method(:"+")]]
+        terp.run '[ 3 2 + ]'
         assert_raise Scratch::StackTooSmall do
           terp.run 'times'
         end
 
         terp.stack.clear
-        terp.send :stack=, [3]
+        terp.run '3'
         assert_raise Scratch::StackTooSmall do
           terp.run 'times'
         end
       end
 
       should "raise MissingListExpectation error when the first element in the stack isn't a list" do
-        terp.send :stack=, [3, 3]
+        terp.run '3 3'
         assert_raise Scratch::MissingListExpectation do
           terp.run 'times'
         end
@@ -62,36 +62,36 @@ class TestControlWords < TestHelper
     context 'is_true? method' do
       should "work when true" do
         terp.run 'true [ 3 dup ] is_true?'
-        assert_equal [3, 3], terp.stack
+        assert_equal_stack [3, 3], terp.stack
       end
 
       should "work when not true" do
         terp.run 'false [ 4 dup ] is_true?'
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
       end
 
       should "raise StackTooSmall error when called with empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run 'is_true?'
         end
       end
 
       should "raise StackTooSmall error when called with one element in the stack" do
-        terp.send :stack=, [true]
+        terp.run 'true'
         assert_raise Scratch::StackTooSmall do
           terp.run 'is_true?'
         end
 
         terp.stack.clear
-        terp.send :stack=, [[1, 4, terp.method(:"+")]]
+        terp.run '[ 1 4 + ]'
         assert_raise Scratch::StackTooSmall do
           terp.run 'is_true?'
         end
       end
 
-      should "raise MissingListExpectation error when the first element in the stack isn't a list" do
-        terp.send :stack=, [true, 3]
+      should "raise MissingListExpectation error when the second element in the stack isn't a list" do
+        terp.run 'true 3'
         assert_raise Scratch::MissingListExpectation do
           terp.run 'is_true?'
         end
@@ -101,36 +101,36 @@ class TestControlWords < TestHelper
     context 'is_false? method' do
       should "work when true" do
         terp.run 'true [ 2 1 - ] is_false?'
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
       end
 
       should "work when false" do
         terp.run 'false [ 9 1 - ] is_false?'
-        assert_equal [8], terp.stack
+        assert_equal_stack [8], terp.stack
       end
 
       should "raise StackTooSmall error when called with empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run 'is_false?'
         end
       end
 
       should "raise StackTooSmall error when called with one element in the stack" do
-        terp.send :stack=, [false]
+        terp.run 'false'
         assert_raise Scratch::StackTooSmall do
           terp.run 'is_false?'
         end
 
         terp.stack.clear
-        terp.send :stack=, [[1, 9, terp.method(:"+")]]
+        terp.run '[ 1 9 + ]'
         assert_raise Scratch::StackTooSmall do
           terp.run 'is_false?'
         end
       end
 
       should "raise MissingListExpectation error when the first element in the stack isn't a list" do
-        terp.send :stack=, [false, 3]
+        terp.run 'false 3'
         assert_raise Scratch::MissingListExpectation do
           terp.run 'is_false?'
         end
@@ -140,56 +140,56 @@ class TestControlWords < TestHelper
     context 'if_else? method' do
       should "work when true" do
         terp.run 'true [ 3 dup ] [ 4 dup ] if_else?'
-        assert_equal [3, 3], terp.stack
+        assert_equal_stack [3, 3], terp.stack
       end
 
       should "work when false" do
         terp.run 'false [ 3 dup ] [ 4 dup ] if_else?'
-        assert_equal [4, 4], terp.stack
+        assert_equal_stack [4, 4], terp.stack
       end
 
       should "raise StackTooSmall error when called with empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run 'if_else?'
         end
       end
 
       should "raise StackTooSmall error when called with one element in the stack" do
-        terp.send :stack=, [true]
+        terp.run 'true'
         assert_raise Scratch::StackTooSmall do
           terp.run 'if_else?'
         end
 
         terp.stack.clear
-        terp.send :stack=, [[5, terp.method(:dup)]]
+        terp.run '[ 5 dup ]'
         assert_raise Scratch::StackTooSmall do
           terp.run 'if_else?'
         end
       end
 
       should "raise StackTooSmall error when called with two elements in the stack" do
-        terp.send :stack=, [true, [5, terp.method(:dup)]]
+        terp.run 'true [ 5 dup ]'
         assert_raise Scratch::StackTooSmall do
           terp.run 'if_else?'
         end
 
         terp.stack.clear
-        terp.send :stack=, [[5, terp.method(:dup)], [3, terp.method(:dup)]]
+        terp.run '[ 5 dup ] [ 3 dup ]'
         assert_raise Scratch::StackTooSmall do
           terp.run 'if_else?'
         end
       end
 
       should "raise MissingListExpectation error when the second element in the stack isn't a list" do
-        terp.send :stack=, [true, 5, [3, terp.method(:dup)]]
+        terp.run '5 [ 3 dup ]'
         assert_raise Scratch::MissingListExpectation do
           terp.run 'if_else?'
         end
       end
 
       should "raise MissingListExpectation error when the third element in the stack isn't a list" do
-        terp.send :stack=, [true, [3, terp.method(:dup)], 5]
+        terp.run 'true [ 3 dup ] 5'
         assert_raise Scratch::MissingListExpectation do
           terp.run 'if_else?'
         end
@@ -218,7 +218,7 @@ class TestControlWords < TestHelper
       end
 
       should "raise StackTooSmall error when called with empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run 'break?'
         end
@@ -228,18 +228,18 @@ class TestControlWords < TestHelper
     context 'loop method' do
       should "work" do
         terp.run '1 [ dup 3 == break? dup 1 + ] loop'
-        assert_equal [1, 2, 3, 4], terp.stack
+        assert_equal_stack [1, 2, 3, 4], terp.stack
       end
 
       should "raise StackTooSmall error when called with empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run 'loop'
         end
       end
 
       should "raise MissingListExpectation error when the first element in the stack isn't a list" do
-        terp.send :stack=, [terp.method(:dup)]
+        terp.run 'dup'
         assert_raise Scratch::MissingListExpectation do
           terp.run 'loop'
         end

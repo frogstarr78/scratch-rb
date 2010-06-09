@@ -24,14 +24,14 @@ class TestConstantWords < TestHelper
       end
 
       should "raise UnexpectedEOI error when called without a const name" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::UnexpectedEOI do
           terp.run "10 const"
         end
       end
 
       should "raise StackTooSmall error when called with an empty stack" do
-        assert_equal [], terp.stack
+        assert_equal_stack [], terp.stack
         assert_raise Scratch::StackTooSmall do
           terp.run "const"
         end
