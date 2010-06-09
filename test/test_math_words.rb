@@ -3,7 +3,7 @@ require 'helper'
 class TestMathWords < TestHelper
 
   context 'Scratch::MathWords' do
-    %w(+ - * / RT).each do |op|
+    %w(+ - * / rt).each do |op|
       should "define #{op}"do
         assert Scratch::MathWords.instance_methods(false).include?( op )
       end
@@ -105,18 +105,18 @@ class TestMathWords < TestHelper
       end
     end
 
-    context "√ op" do
+    context "rt op" do
       should "works" do
         terp.run '25'
         assert_equal [25], terp.stack
-        terp.run "RT"
+        terp.run "rt"
         assert_equal [5], terp.stack
       end
 
       should "raise StackTooSmall error when called with an empty stack" do
         assert_equal [], terp.stack
         assert_raise Scratch::StackTooSmall do
-          terp.run "RT"
+          terp.run "rt"
         end
       end
     end
