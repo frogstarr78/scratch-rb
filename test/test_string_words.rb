@@ -13,5 +13,4 @@ class TestStringWords < TestHelper
       end
     end
   end
-
 end
