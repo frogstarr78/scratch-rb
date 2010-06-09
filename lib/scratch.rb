@@ -81,12 +81,12 @@ module Scratch
 
   module PrintingWords
     def print
-      error_if_stack_isnt_sufficient! :empty?
+      error_if_stack_isnt! 1
       Kernel.print stack.pop
     end
 
     def puts
-      error_if_stack_isnt_sufficient! :empty?
+      error_if_stack_isnt! 1
       Kernel.puts stack.pop
     end
 
@@ -97,7 +97,7 @@ module Scratch
 
   module MathWords
     def math_op op
-      error_if_stack_isnt_sufficient! 2
+      error_if_stack_isnt! 2
       tstack2, tstack = stack.pop 2
       stack << tstack2.send( op, tstack )
     end
@@ -120,44 +120,37 @@ module Scratch
     end
 
     def rt
-      error_if_stack_isnt_sufficient! :empty?
+      error_if_stack_isnt! 1
       stack << stack.pop ** 0.5
     end
   end
 
   module StackWords
     def dup 
-      error_if_stack_isnt_sufficient! 1
-      tos = stack.pop
-      stack << tos << tos
+      error_if_stack_isnt! 1
+      stack << stack.last
     end
 
     def drop
-      error_if_stack_isnt_sufficient! 1
+      error_if_stack_isnt! 1
       stack.pop
     end
 
     def swap
-      error_if_stack_isnt_sufficient! 2
+      error_if_stack_isnt! 2
       _2os, tos = stack.pop 2
-      stack << tos
-      stack << _2os
+      stack << tos << _2os
     end
 
     def over
-      error_if_stack_isnt_sufficient! 2
-      _2os, tos = stack.pop 2
-      stack << _2os
-      stack << tos
-      stack << _2os
+      error_if_stack_isnt! 2
+      stack << stack[-2]
     end
 
     def rot
-      error_if_stack_isnt_sufficient! 3
+      error_if_stack_isnt! 3
       _3os, _2os, tos = stack.pop 3
-      stack << _2os
-      stack << tos
-      stack << _3os
+      stack << _2os << tos << _3os
     end
   end
 
@@ -171,13 +164,13 @@ module Scratch
     end
 
     def store
-      error_if_stack_isnt_sufficient! 2
+      error_if_stack_isnt! 2
       @var = stack.pop
       @var.value = stack.pop
     end
 
     def fetch
-      error_if_stack_isnt_sufficient! 1
+      error_if_stack_isnt! 1
       @var = stack.pop
       stack << @var.value
     end
@@ -185,7 +178,7 @@ module Scratch
 
   module ConstantWords
     def const
-      error_if_stack_isnt_sufficient! 1
+      error_if_stack_isnt! 1
 
       const_name = lexer.next_word
       raise UnexpectedEOI.new if const_name.nil?
@@ -264,16 +257,16 @@ module Scratch
     end
 
     def length
-      error_if_stack_isnt_sufficient! 1
+      error_if_stack_isnt! 1
       stack << stack.pop.size
     end
 
     def item
-      error_if_stack_isnt_sufficient! 2
+      error_if_stack_isnt! 2
 
       list, index = stack.pop 2
 
-      stack.push list[index]
+      stack << list[index]
     end
   end
 
@@ -287,32 +280,32 @@ module Scratch
     end
 
     def or
-      error_if_stack_isnt_sufficient! 2
+      error_if_stack_isnt! 2
 
       left_term, right_term = stack.pop 2
-      stack.push left_term || right_term
+      stack << ( left_term || right_term )
     end
 
     def and
-      error_if_stack_isnt_sufficient! 2
+      error_if_stack_isnt! 2
 
       left_term, right_term = stack.pop 2
-      stack.push left_term && right_term
+      stack << ( left_term && right_term )
     end
 
     def not
-      error_if_stack_isnt_sufficient! 1
+      error_if_stack_isnt! 1
 
-      stack.push !stack.pop
+      stack << !stack.pop
     end
   end
 
   module ComparisonWords
     def comparison_op op
-      error_if_stack_isnt_sufficient! 2
+      error_if_stack_isnt! 2
 
       left_term, right_term = stack.pop 2
-      stack.push left_term.send op, right_term
+      stack << left_term.send( op, right_term )
     end
     private :comparison_op
 
@@ -339,7 +332,7 @@ module Scratch
 
   module ControlWords
     def exec
-      error_if_stack_isnt_sufficient! 1
+      error_if_stack_isnt! 1
       code_list = stack.pop
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
 
@@ -347,7 +340,7 @@ module Scratch
     end
 
     def times
-      error_if_stack_isnt_sufficient! 2
+      error_if_stack_isnt! 2
       code_list, num_times = stack.pop 2
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
 
@@ -358,7 +351,7 @@ module Scratch
     end
 
     def is_true?
-      error_if_stack_isnt_sufficient! 2
+      error_if_stack_isnt! 2
       cond, code_list = stack.pop 2
 
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
@@ -368,7 +361,7 @@ module Scratch
     end
 
     def is_false?
-      error_if_stack_isnt_sufficient! 2
+      error_if_stack_isnt! 2
       cond, code_list = stack.pop 2
 
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
@@ -378,7 +371,7 @@ module Scratch
     end
 
     def if_else?
-      error_if_stack_isnt_sufficient! 3
+      error_if_stack_isnt! 3
       cond, true_code, false_code = stack.pop 3
 
       raise MissingListExpectation.new(true_code) unless true_code.is_a? Array
@@ -392,17 +385,17 @@ module Scratch
     end
 
 #    def continue?
-#      error_if_stack_isnt_sufficient! 1
+#      error_if_stack_isnt! 1
 ##      next if stack.pop
 #    end
 
     def break?
-      error_if_stack_isnt_sufficient! 1
+      error_if_stack_isnt! 1
       self.break_state = true if stack.pop
     end
 
     def loop
-      error_if_stack_isnt_sufficient! 1
+      error_if_stack_isnt! 1
       code_list = stack.pop
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
 
@@ -492,15 +485,10 @@ module Scratch
       end
     end
 
-    def error_if_stack_isnt_sufficient! check
-      case check
-      when :empty?
-        raise StackTooSmall.new stack, '> 0' if self.stack.empty? 
-      when Fixnum
-        raise StackTooSmall.new stack, check if self.stack.size < check 
-      end
+    def error_if_stack_isnt! check
+      raise StackTooSmall.new stack, check if self.stack.size < check 
     end
-    private :error_if_stack_isnt_sufficient!
+    private :error_if_stack_isnt!
 
     class << self
       def [] mod
@@ -531,22 +519,14 @@ module Scratch
 end
 
 if $0 == __FILE__
+  $LOAD_PATH << 'lib'
   include Scratch
   terp = Scratch::Scratch.new
-  terp.add_words( StringWords )
-  terp.add_words( CommentWords )
-  terp.add_words( StackWords )
-  terp.add_words( CompilingWords )
-  terp.add_words( ListWords )
-  terp.add_words( ControlWords )
-  terp.add_words( ComparisonWords )
-  terp.add_words( LogicWords )
-
 
 #  terp.run "1"
 #  terp.run "drop"
-#  terp.run 'puts'
-#  terp.run "1 2 3 45 678"
+  terp.run 'puts'
+  terp.run "1 2 3 45 678"
 #  terp.run "pstack"
 #  terp.run '" ----------------------" print'
 #  terp.run '" - dup" print'
