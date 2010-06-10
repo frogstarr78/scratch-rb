@@ -14,7 +14,7 @@ module Scratch
         if Scratch::IMMEDIATES.include? word
           interpret token
         else
-          self << token
+          self.stack << token
         end
         word = lexer.next_word
       end
@@ -22,7 +22,7 @@ module Scratch
 
       list = self.stack
       self.stack = old_stack
-      self << list
+      self.stack << list
     end
 
     define_method :"]" do
@@ -30,7 +30,7 @@ module Scratch
 
     def length
       error_if_stack_isnt! 1
-      self << stack.pop.size
+      self.stack << stack.pop.size
     end
 
     def item
@@ -38,7 +38,7 @@ module Scratch
 
       list, index = stack.pop 2
 
-      self << list[index]
+      self.stack << list[index]
     end
   end
 end

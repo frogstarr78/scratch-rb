@@ -1,7 +1,6 @@
 require 'helper'
 
 class TestMathWords < TestHelper
-
   context 'Scratch::StackWords' do
     %w(dup drop swap over rot).each do |meth|
       should "define #{meth}"do
@@ -90,7 +89,7 @@ class TestMathWords < TestHelper
     end
 
     context "rot method" do
-      should "works" do
+      should "work" do
         terp.run '6 4 5'
         assert_equal_stack [6, 4, 5], terp.stack
         terp.run "rot"
@@ -120,6 +119,5 @@ class TestMathWords < TestHelper
         end
       end
     end
-
   end
 end

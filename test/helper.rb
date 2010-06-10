@@ -4,6 +4,7 @@ require 'test/unit/assertions'
 require 'shoulda'
 require 'mocha'
 require 'unittest-colorizer'
+require 'ruby-debug'
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
@@ -17,8 +18,8 @@ class TestHelper < Test::Unit::TestCase
   def test_me
   end
 
-  def equal_stack compiling, expected, stack, message = nil
-    message = build_message "?\nexpected ?compiling stack to be <?>, but was <?>.", message, ('non-' unless compiling), expected.inspect, stack.inspect
+  def equal_stack compiling, expected, stack, xtra_message = ''
+    message = "#{xtra_message}\nexpected #{'non-' unless compiling}compiling stack to be <#{expected.inspect}>, but was <#{stack.inspect}>."
     assert_block message do
       expected == stack
     end
@@ -36,13 +37,5 @@ end
 module Scratch
   class Stack
     attr_reader :data, :buffer
-
-    def pop
-      if compiling?
-        @buffer.pop
-      else
-        @data.pop
-      end
-    end
   end
 end

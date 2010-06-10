@@ -10,7 +10,7 @@ module Scratch
 
     def times
       error_if_stack_isnt! 2
-      code_list, num_times = stack.pop 2
+      code_list, num_times = self.stack.pop 2
       raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
 
       word = make_word code_list

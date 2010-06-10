@@ -1,7 +1,6 @@
 require 'helper'
 
 class TestMathWords < TestHelper
-
   context 'Scratch::MathWords' do
     %w(+ - * / rt).each do |op|
       should "define #{op}"do

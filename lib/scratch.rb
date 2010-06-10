@@ -62,7 +62,7 @@ module Scratch
         if IMMEDIATES.include? word
           self.interpret token
         elsif self.stack.compiling?
-          self << token
+          self.stack << token
         else
           self.interpret token
         end
@@ -84,7 +84,7 @@ module Scratch
       if ( word.is_a? Method and respond_to? word.name ) or word.is_a? Proc
         word.call
       else
-        self << word
+        self.stack << word
       end
     end
 
@@ -93,9 +93,9 @@ module Scratch
     end
     private :error_if_stack_isnt!
 
-    def << thing
-      self.stack << thing
-    end
+#    def << thing
+#      self.stack << thing
+#    end
 #    private :<<
 
     include PrintingWords

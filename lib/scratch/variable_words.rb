@@ -5,7 +5,7 @@ module Scratch
       raise UnexpectedEOI.new if var_name.nil?
 
       @var = ::Scratch::Variable.new( 0 )
-      define_variable(var_name) { self << @var }
+      define_variable(var_name) { self.stack << @var }
     end
 
     def store
@@ -17,7 +17,7 @@ module Scratch
     def fetch
       error_if_stack_isnt! 1
       @var = stack.pop
-      self << @var.value
+      self.stack << @var.value
     end
   end
 end

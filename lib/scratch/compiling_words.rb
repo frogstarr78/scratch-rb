@@ -9,9 +9,8 @@ module Scratch
     end
 
     def end
-      code = stack.dup
-      stack = []
-      define_variable latest, &make_word(code)
+      func = make_word(self.stack.stack)
+      define_variable latest, &func
       self.stack.stop_compiling!
       self.latest = nil
     end

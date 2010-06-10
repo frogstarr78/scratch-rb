@@ -182,7 +182,7 @@ class TestControlWords < TestHelper
       end
 
       should "raise MissingListExpectation error when the second element in the stack isn't a list" do
-        terp.run '5 [ 3 dup ]'
+        terp.run 'true 5 [ 3 dup ]'
         assert_raise Scratch::MissingListExpectation do
           terp.run 'if_else?'
         end
@@ -239,7 +239,7 @@ class TestControlWords < TestHelper
       end
 
       should "raise MissingListExpectation error when the first element in the stack isn't a list" do
-        terp.run 'dup'
+        terp.run '9'
         assert_raise Scratch::MissingListExpectation do
           terp.run 'loop'
         end
