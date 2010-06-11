@@ -2,7 +2,6 @@ require 'delegate'
 
 module Scratch
   class Stack
-#    attr_reader :stack
     def initialize
       @data = []
       @buffer = []
@@ -45,11 +44,6 @@ module Scratch
 
     def << stuff
       stack << stuff
-#      if compiling?
-#        @buffer << stuff
-#      else
-#        @data << stuff
-#      end
     end
 
     def [] index
@@ -59,11 +53,5 @@ module Scratch
     def clear 
       stack.clear
     end
-
-#    def method_missing method, *args
-#      unless method.to_s == 'each'
-#        @stack.__getobj__.send method, *args
-#      end
-#    end
   end
 end
