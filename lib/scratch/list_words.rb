@@ -35,10 +35,10 @@ module Scratch
 
     def item
       error_if_stack_isnt! 2
+      code_list, index = stack.pop 2
+      raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
 
-      list, index = stack.pop 2
-
-      self.stack << list[index]
+      self.stack << code_list[index]
     end
   end
 end
