@@ -93,11 +93,6 @@ module Scratch
     end
     private :error_if_stack_isnt!
 
-#    def << thing
-#      self.stack << thing
-#    end
-#    private :<<
-
     include PrintingWords
     include MathWords
     include StackWords
