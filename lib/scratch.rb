@@ -88,16 +88,6 @@ module Scratch
       end
     end
 
-    def get_n_stack_items num
-      error_if_stack_isnt! num 
-      yield *stack.pop(num)
-    end
-
-    def error_if_stack_isnt! check
-      raise StackTooSmall.new stack, check if self.stack.size < check 
-    end
-    private :error_if_stack_isnt!
-
     include PrintingWords
     include MathWords
     include StackWords

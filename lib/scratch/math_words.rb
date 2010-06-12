@@ -1,9 +1,9 @@
 module Scratch
   module MathWords
     def math_op op
-      error_if_stack_isnt! 2
-      tstack2, tstack = self.stack.pop 2
-      self.stack << tstack2.send( op, tstack )
+      self.stack.get_n_stack_items 2 do |_2os, tos|
+        self.stack << _2os.send( op, tos )
+      end
     end
     private :math_op
 
@@ -24,8 +24,9 @@ module Scratch
     end
 
     def rt
-      error_if_stack_isnt! 1
-      self.stack << ( self.stack.pop ** 0.5 )
+      self.stack.get_n_stack_items do |num|
+        self.stack << ( num ** 0.5 )
+      end
     end
   end
 end

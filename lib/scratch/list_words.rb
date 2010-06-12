@@ -29,16 +29,17 @@ module Scratch
     end
 
     def length
-      error_if_stack_isnt! 1
-      self.stack << stack.pop.size
+      self.stack.get_n_stack_items do |code_list|
+#        raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
+        self.stack << code_list.size
+      end
     end
 
     def item
-      error_if_stack_isnt! 2
-      code_list, index = stack.pop 2
-      raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
-
-      self.stack << code_list[index]
+      self.stack.get_n_stack_items 2 do |code_list, index|
+        raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
+        self.stack << code_list[index]
+      end
     end
   end
 end

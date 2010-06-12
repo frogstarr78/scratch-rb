@@ -9,23 +9,21 @@ module Scratch
     end
 
     def or
-      error_if_stack_isnt! 2
-
-      left_term, right_term = stack.pop 2
-      self.stack << ( left_term || right_term )
+      self.stack.get_n_stack_items 2 do |left_term, right_term|
+        self.stack << ( left_term || right_term )
+      end
     end
 
     def and
-      error_if_stack_isnt! 2
-
-      left_term, right_term = stack.pop 2
-      self.stack << ( left_term && right_term )
+      self.stack.get_n_stack_items 2 do |left_term, right_term|
+        self.stack << ( left_term && right_term )
+      end
     end
 
     def not
-      error_if_stack_isnt! 1
-
-      self.stack << !stack.pop
+      self.stack.get_n_stack_items do |is|
+        self.stack << !is
+      end
     end
   end
 end

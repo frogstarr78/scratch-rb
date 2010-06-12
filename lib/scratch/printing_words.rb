@@ -1,17 +1,19 @@
 module Scratch
   module PrintingWords
     def print
-      error_if_stack_isnt! 1
-      Kernel.print stack.pop
+      self.stack.get_n_stack_items do |stuff|
+        Kernel.print stuff
+      end
     end
 
     def puts
-      error_if_stack_isnt! 1
-      Kernel.puts stack.pop
+      self.stack.get_n_stack_items do |stuff|
+        Kernel.puts stuff
+      end
     end
 
     def pstack
-      Kernel.puts stack
+      Kernel.puts self.stack
     end
   end
 end

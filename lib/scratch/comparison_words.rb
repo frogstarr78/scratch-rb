@@ -1,10 +1,9 @@
 module Scratch
   module ComparisonWords
     def comparison_op op
-      error_if_stack_isnt! 2
-
-      left_term, right_term = stack.pop 2
-      self.stack << left_term.send( op, right_term )
+      self.stack.get_n_stack_items 2 do |left_term, right_term|
+        self.stack << left_term.send( op, right_term )
+      end
     end
     private :comparison_op
 

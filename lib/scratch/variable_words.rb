@@ -9,15 +9,17 @@ module Scratch
     end
 
     def store
-      error_if_stack_isnt! 2
-      @var = stack.pop
-      @var.value = stack.pop
+      self.stack.get_n_stack_items 2 do |value, var|
+        @var = var
+        @var.value = value
+      end
     end
 
     def fetch
-      error_if_stack_isnt! 1
-      @var = stack.pop
-      self.stack << @var.value
+      self.stack.get_n_stack_items do |var|
+        @var = var
+        self.stack << @var.value
+      end
     end
   end
 end
