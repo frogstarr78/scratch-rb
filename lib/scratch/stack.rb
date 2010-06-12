@@ -63,6 +63,5 @@ module Scratch
     def error_if_stack_isnt! check
       raise StackTooSmall.new stack, check if self.stack.size < check 
     end
-    private :error_if_stack_isnt!
   end
 end
