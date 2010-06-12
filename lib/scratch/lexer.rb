@@ -1,11 +1,8 @@
 module Scratch
-  class ScratchLexer
+  class Lexer
     require 'stringio' 
 
-    attr_accessor :words, :generator
-    def initialize
-#      @words = ::StringIO.new txt
-    end
+    attr_reader :words
 
     def next_word
       word = nil
@@ -13,6 +10,7 @@ module Scratch
       while char
         if char.is_whitespace?
           if word.blank?
+            char = @words.read( 1 )
             next
           else
             return word

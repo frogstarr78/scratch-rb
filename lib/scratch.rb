@@ -38,7 +38,7 @@ module Scratch
 #      @stack       = @data_stack
       @lexer       = nil
       @break_state = false
-      @lexer = ScratchLexer.new
+      @lexer = Lexer.new
     end
 
     def define_variable term, &block
