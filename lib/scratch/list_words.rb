@@ -6,8 +6,7 @@ module Scratch
       self.stack = list
 
       word = lexer.next_word
-      while word
-        raise UnexpectedEOI.new if word.nil?
+      until word.nil?
         break if word == ']'
 
         token = compile word
