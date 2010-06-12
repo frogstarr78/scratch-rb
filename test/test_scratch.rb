@@ -72,17 +72,18 @@ class TestScratch < TestHelper
         context "interfacing with the lexer" do
           setup do
             @string_to_parse = '3 dup'
-            @mock_lexer = Scratch::ScratchLexer.new @string_to_parse
+            @mock_lexer = Scratch::ScratchLexer.new
+            terp.send :lexer=,  @mock_lexer
           end
 
           should "initialize a new one" do
-            Scratch::ScratchLexer.expects(:new).with(@string_to_parse).returns @mock_lexer
+            @mock_lexer.expects(:parse).with(@string_to_parse)
+            @mock_lexer.expects(:next_word)
             terp.run @string_to_parse
           end
 
           should "call next_word" do
             terp.run '3'
-            terp.send :lexer=, @mock_lexer
             until_nil_word = sequence('until word.nil?')
 
             Scratch::ScratchLexer.any_instance.expects(:next_word).in_sequence(until_nil_word).returns '3'

@@ -3,8 +3,8 @@ module Scratch
     require 'stringio' 
 
     attr_accessor :words, :generator
-    def initialize txt
-      @words = ::StringIO.new txt
+    def initialize
+#      @words = ::StringIO.new txt
     end
 
     def next_word
@@ -39,6 +39,10 @@ module Scratch
         char = @words.read( 1 )
       end
       word
+    end
+
+    def parse txt
+      @words = ::StringIO.new txt
     end
   end
 end

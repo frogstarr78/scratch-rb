@@ -38,6 +38,7 @@ module Scratch
 #      @stack       = @data_stack
       @lexer       = nil
       @break_state = false
+      @lexer = ScratchLexer.new
     end
 
     def define_variable term, &block
@@ -54,7 +55,7 @@ module Scratch
     private :make_word
 
     def run text
-      self.lexer = ScratchLexer.new(text)
+      lexer.parse text
 
       word = lexer.next_word
       until word.nil?
