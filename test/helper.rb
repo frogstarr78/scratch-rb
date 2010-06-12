@@ -37,5 +37,6 @@ end
 module Scratch
   class Stack
     attr_reader :data, :buffer
+    attr_accessor :compiling
   end
 end
