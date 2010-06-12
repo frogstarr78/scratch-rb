@@ -54,5 +54,15 @@ module Scratch
     def clear 
       stack.clear
     end
+
+    def get_n_stack_items num = 1
+      error_if_stack_isnt! num 
+      yield *stack.pop(num)
+    end
+
+    def error_if_stack_isnt! check
+      raise StackTooSmall.new stack, check if self.stack.size < check 
+    end
+    private :error_if_stack_isnt!
   end
 end

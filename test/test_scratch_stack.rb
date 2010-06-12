@@ -181,5 +181,55 @@ class TestScratchStack < TestHelper
         assert_equal 0, stack.size
       end
     end
+
+    context "error_if_stack_isnt!" do
+      setup do
+        stack << 1 << 2
+      end
+
+      should "raise error when the stack isn't correct size" do
+        assert_raise Scratch::StackTooSmall do
+          stack.send :error_if_stack_isnt!, 3
+        end
+        assert_equal_stack [1, 2], stack
+      end
+
+      should "not raise an error when the stack is less than the supplied size" do
+        assert_nothing_raised do
+          stack.send :error_if_stack_isnt!, 2
+        end
+        assert_equal_stack [1, 2], stack
+      end
+    end
+
+    context "get_n_stack_items" do
+      setup do
+        stack << 3 << 4
+        @yielded_items = []
+      end
+
+      should "yield 1 item by default " do
+        stack.get_n_stack_items do |*items|
+          @yielded_items = items
+        end
+        assert_equal [4], @yielded_items
+      end
+
+      should "yield the requested number of items" do
+        stack.get_n_stack_items 2 do |*items|
+          @yielded_items = items
+        end
+        assert_equal [3, 4], @yielded_items
+      end
+
+      should "rather than yield number of items, raise an error, when the number of items aren't available" do
+        assert_raise Scratch::StackTooSmall do
+          stack.get_n_stack_items 3 do |*items|
+            @yielded_items = items
+          end
+          assert_equal [], @yielded_items
+        end
+      end
+    end
   end
 end
