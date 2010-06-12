@@ -133,6 +133,42 @@ class TestScratch < TestHelper
           assert_equal_stack ['1', "hello", "hello", false], terp.stack
         end
       end
+
+      context "error_if_stack_isnt!" do
+        setup do
+          terp.run '1 2'
+        end
+
+        should "raise error when the stack isn't correct size" do
+          assert_raise Scratch::StackTooSmall do
+            terp.send :error_if_stack_isnt!, 3
+          end
+          assert_equal_stack [1, 2], terp.stack
+        end
+
+        should "not raise an error when the stack is less than the supplied size" do
+          assert_nothing_raised do
+            terp.send :error_if_stack_isnt!, 2
+          end
+          assert_equal_stack [1, 2], terp.stack
+        end
+      end
+
+      context "get_n_stack_items" do
+        should "yield the requested number of items" do
+          terp.run '3 4'
+          terp.get_n_stack_items 2 do |*items|
+            assert_equal [3, 4], items
+          end
+        end
+
+        should "rather than yield number of items, raise an error, when the number of items aren't available" do
+          terp.run '3 4'
+          assert_raise Scratch::StackTooSmall do
+            terp.get_n_stack_items 3
+          end
+        end
+      end
     end
   end
 end
