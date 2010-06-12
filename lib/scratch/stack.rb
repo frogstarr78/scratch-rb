@@ -11,6 +11,7 @@ module Scratch
 
     def compiling?
       @compiling == true
+#      stack.object_id == @buffer.object_id
     end
 
     def start_compiling!
@@ -29,7 +30,7 @@ module Scratch
     end
 
     def pop n = nil
-      return stack.pop if n.nil?
+      return stack.pop if n.nil? or n == 1
       stack.pop n
     end
 
@@ -38,7 +39,7 @@ module Scratch
     end
 
     def last n = nil
-      return stack.last if n.nil?
+      return stack.last if n.nil? or n == 1
       stack.last n
     end
 
