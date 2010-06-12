@@ -26,6 +26,10 @@ module Scratch
     end
 
     define_method :"]" do
+      # place holder method so the interpreter doesn't error
+      # parsing this character. We don't want to do anything
+      # with the stack though, in case we'er dealing with nested
+      # arrays.
     end
 
     def length
