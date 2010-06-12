@@ -1,6 +1,8 @@
 # scratch-rb
 
 Ruby port of [Felix Pleşoianu's](http://felix.plesoianu.ro/scratch-lang/scratch-lang.html "Felix Pleşoianu's") Scratch programming language.
+See the RawPort git tag to get a pretty straight conversion from Felix's javascript code to equivalent ruby code. 
+I'm developing it further, taking advantage of some of ruby's features to explore createing a language further.
 
 ## LICENSE
 
