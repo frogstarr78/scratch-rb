@@ -2,6 +2,11 @@ require 'delegate'
 
 module Scratch
   class Stack
+    stack_delegate_methods = %w(dup)
+    stack_delegate_methods.each do |meth|
+      undef_method meth.to_sym
+    end
+
     def initialize
       @data = []
       @buffer = []
@@ -34,29 +39,9 @@ module Scratch
       stack.pop n
     end
 
-    def size
-      stack.size
-    end
-
     def last n = nil
       return stack.last if n.nil? or n == 1
       stack.last n
-    end
-
-    def << stuff
-      stack << stuff
-    end
-
-    def [] index
-      stack[index]
-    end
-
-    def clear 
-      stack.clear
-    end
-
-    def dup
-      stack.dup
     end
 
     def get_n_stack_items num = 1
@@ -77,6 +62,15 @@ module Scratch
 
     def error_if_stack_isnt! check
       raise StackTooSmall.new stack, check if self.stack.size < check 
+    end
+
+    def method_missing sym, *arguments
+      meth = self.stack.method(sym)
+      if meth.arity == 0
+        meth.call
+      else
+        meth.call *arguments
+      end
     end
   end
 end

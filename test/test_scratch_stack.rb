@@ -11,7 +11,7 @@ class TestScratchStack < TestHelper
       @data_object_id   = stack.data.object_id
     end
 
-    %w(compiling? start_compiling! stop_compiling! stack pop size last << [] clear dup).each do |meth|
+    %w(compiling? start_compiling! stop_compiling! stack pop last).each do |meth|
       should "respond_to? #{meth}" do
         assert_respond_to terp.stack, meth
       end
