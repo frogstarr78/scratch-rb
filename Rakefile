@@ -32,6 +32,7 @@ begin
     test.libs << 'test'
     test.pattern = 'test/**/test_*.rb'
     test.verbose = true
+    test.rcov_opts = %w(--text-report --exclude=ruby-debug,unittest-colorizer,mocha,shoulda,colored,rcov,linecache,columnize)
   end
 rescue LoadError
   task :rcov do
