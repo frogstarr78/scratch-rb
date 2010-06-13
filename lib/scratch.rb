@@ -3,6 +3,7 @@
 require 'generator' 
 require 'core_ext/nil'
 require 'core_ext/string'
+require 'core_ext/boolean'
 require 'scratch/variable'
 require 'scratch/lexer'
 require 'scratch/exceptions'
@@ -94,6 +95,13 @@ module Scratch
         self.stack << word
       end
     end
+
+    def send_ruby_op op
+      self.stack.replace_n_pop_items 2 do |left_term, right_term|
+        left_term.send( op, right_term )
+      end
+    end
+    private :send_ruby_op
 
     include PrintingWords
     include MathWords

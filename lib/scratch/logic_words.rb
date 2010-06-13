@@ -17,7 +17,7 @@ module Scratch
     end
 
     def not
-      self.stack.replace_n_pop_items(&:"!")
+      self.stack.replace_n_pop_items(&"!".to_sym)
     end
   end
 end

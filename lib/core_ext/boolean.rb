@@ -1,9 +1,9 @@
 class TrueClass
-  define_method :"&&" do |other|
+  define_method "&&" do |other|
     self && other
   end
 
-  define_method :"||" do |other|
+  define_method "||" do |other|
     self || other
   end
 
