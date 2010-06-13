@@ -34,6 +34,14 @@ class TestListWords < TestHelper
           terp.run "length"
         end
       end
+
+      should "raise MissingListExpectation error when first element on the stack isn't an array" do
+        terp.run '1'
+        assert_equal_stack [1], terp.stack
+        assert_raise Scratch::MissingListExpectation do
+          terp.run "length"
+        end
+      end
     end
 
     context 'item method' do
