@@ -2,10 +2,7 @@ require 'delegate'
 
 module Scratch
   class Stack
-    stack_delegate_methods = %w(dup)
-    stack_delegate_methods.each do |meth|
-      undef_method meth.to_sym
-    end
+    undef_method :dup
 
     def initialize
       @data = []
@@ -51,7 +48,7 @@ module Scratch
 
     def replace_n_pop_items num = 1, &block
       items = get_n_stack_items( num, &block )
-      if items.is_a? Array
+      if items.is_array?
         items.each do |item|
           self.stack << item
         end
@@ -66,11 +63,8 @@ module Scratch
 
     def method_missing sym, *arguments
       meth = self.stack.method(sym)
-      if meth.arity == 0
-        meth.call
-      else
-        meth.call *arguments
-      end
+      return meth.call if meth.arity == 0
+      meth.call *arguments
     end
   end
 end
