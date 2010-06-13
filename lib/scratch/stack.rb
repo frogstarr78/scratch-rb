@@ -60,6 +60,17 @@ module Scratch
       yield *stack.pop(num)
     end
 
+    def replace_n_pop_items num = 1, &block
+      items = get_n_stack_items( num, &block )
+      if items.is_a? Array
+        items.each do |item|
+          self.stack << item
+        end
+      else
+        self.stack << items
+      end
+    end
+
     def error_if_stack_isnt! check
       raise StackTooSmall.new stack, check if self.stack.size < check 
     end

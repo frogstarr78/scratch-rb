@@ -9,7 +9,7 @@ class TestMathWords < TestHelper
     end
 
     context "dup method" do
-      should "works" do
+      should "work" do
         terp.run '0 1'
         assert_equal_stack [0, 1], terp.stack
         terp.run "dup"
@@ -25,7 +25,7 @@ class TestMathWords < TestHelper
     end
 
     context "drop method" do
-      should "works" do
+      should "work" do
         terp.run '2 3'
         assert_equal_stack [2, 3], terp.stack
         terp.run "drop"
@@ -41,7 +41,7 @@ class TestMathWords < TestHelper
     end
 
     context "swap method" do
-      should "works" do
+      should "work" do
         terp.run '4 3'
         assert_equal_stack [4, 3], terp.stack
         terp.run "swap"
@@ -65,7 +65,7 @@ class TestMathWords < TestHelper
     end
 
     context "over method" do
-      should "works" do
+      should "work" do
         terp.run '5 4'
         assert_equal_stack [5, 4], terp.stack
         terp.run "over"

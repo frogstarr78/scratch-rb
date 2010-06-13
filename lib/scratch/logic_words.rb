@@ -9,21 +9,15 @@ module Scratch
     end
 
     def or
-      self.stack.get_n_stack_items 2 do |left_term, right_term|
-        self.stack << ( left_term || right_term )
-      end
+      send_ruby_op "||"
     end
 
     def and
-      self.stack.get_n_stack_items 2 do |left_term, right_term|
-        self.stack << ( left_term && right_term )
-      end
+      send_ruby_op "&&"
     end
 
     def not
-      self.stack.get_n_stack_items do |is|
-        self.stack << !is
-      end
+      self.stack.replace_n_pop_items(&"!".to_sym)
     end
   end
 end

@@ -1,27 +1,19 @@
 module Scratch
   module ListWords
     define_method :"[" do
-      list = []
-      old_stack = self.stack
-      self.stack = list
+      self.stack.start_compiling!
 
       word = lexer.next_word
-      while word
-        raise UnexpectedEOI.new if word.nil?
+      until word.nil?
         break if word == ']'
 
-        token = compile word
-        if Scratch::IMMEDIATES.include? word
-          interpret token
-        else
-          self.stack << token
-        end
+        interpret! word
         word = lexer.next_word
       end
       raise UnexpectedEOI.new unless word == ']'
 
-      list = self.stack
-      self.stack = old_stack
+      list = self.stack.stack.dup
+      self.stack.stop_compiling!
       self.stack << list
     end
 
@@ -33,16 +25,16 @@ module Scratch
     end
 
     def length
-      self.stack.get_n_stack_items do |code_list|
+      self.stack.replace_n_pop_items do |code_list|
 #        raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
-        self.stack << code_list.size
+        code_list.size
       end
     end
 
     def item
-      self.stack.get_n_stack_items 2 do |code_list, index|
+      self.stack.replace_n_pop_items 2 do |code_list, index|
         raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
-        self.stack << code_list[index]
+        code_list[index]
       end
     end
   end
