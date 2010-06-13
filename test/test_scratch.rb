@@ -178,6 +178,15 @@ class TestScratch < TestHelper
           assert_equal [], @yielded_items
         end
       end
+
+      should "rather than yield number of items, raise an error, when the type is invalid" do
+        assert_raise Scratch::InvalidType do
+          terp.get_n_types String, String do |*items|
+            @yielded_items = items
+          end
+          assert_equal [], @yielded_items
+        end
+      end
     end
   end
 end
