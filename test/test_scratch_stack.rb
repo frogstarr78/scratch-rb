@@ -11,7 +11,7 @@ class TestScratchStack < TestHelper
       @data_object_id   = stack.data.object_id
     end
 
-    %w(compiling? start_compiling! stop_compiling! stack pop size last << [] clear).each do |meth|
+    %w(compiling? start_compiling! stop_compiling! stack pop size last << [] clear dup).each do |meth|
       should "respond_to? #{meth}" do
         assert_respond_to terp.stack, meth
       end
@@ -179,6 +179,28 @@ class TestScratchStack < TestHelper
         assert_equal 5, stack.size
         stack.clear
         assert_equal 0, stack.size
+      end
+    end
+
+    context "\b#dup" do
+      setup do
+        @stack_id = stack.object_id
+      end
+      should "copy data stack" do
+        stack << 1 << 2 << 3
+        assert_equal_stack [1, 2, 3], stack
+        dup_stack = stack.dup
+        assert_equal [1, 2, 3], dup_stack
+        assert_not_equal dup_stack.object_id, @stack_id
+      end
+
+      should "copy buffer stack" do
+        stack.start_compiling!
+        stack << 1 << 2 << 3
+        assert_equal_compiling_stack [1, 2, 3], stack
+        dup_stack = stack.dup
+        assert_equal [1, 2, 3], dup_stack
+        assert_not_equal dup_stack.object_id, @stack_id
       end
     end
 

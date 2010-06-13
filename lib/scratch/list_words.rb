@@ -12,7 +12,7 @@ module Scratch
       end
       raise UnexpectedEOI.new unless word == ']'
 
-      list = self.stack.stack.dup
+      list = self.stack.dup
       self.stack.stop_compiling!
       self.stack << list
     end

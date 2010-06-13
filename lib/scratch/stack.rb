@@ -55,6 +55,10 @@ module Scratch
       stack.clear
     end
 
+    def dup
+      stack.dup
+    end
+
     def get_n_stack_items num = 1
       error_if_stack_isnt! num 
       yield *stack.pop(num)
