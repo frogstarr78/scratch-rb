@@ -8,23 +8,23 @@ class TestPrintingWords < TestHelper
       end
     end
 
-    should "'puts' an element from the stack" do
-      terp.expects(:puts)
+    should "puts stack items when calling #puts" do
+      Kernel.expects(:puts).with 4
       terp.run '4'
       assert_equal_stack [4], terp.stack
       terp.run "puts"
     end
 
-    should "raise StackTooSmall error when 'puts' is called with an empty stack" do
-      assert_equal_stack [], terp.stack
-      assert_raise Scratch::StackTooSmall do
-        terp.run "puts"
-      end
+    should "print stack items when calling #print" do
+      terp.run '6'
+      Kernel.expects(:print).with 6
+      assert_equal_stack [6], terp.stack
+      terp.run 'print'
     end
 
     should "puts stack when 'pstack' is called" do
-      terp.expects(:pstack)
       terp.run '5'
+      Kernel.expects(:puts).with terp.stack.stack
       assert_equal_stack [5], terp.stack
       terp.run "pstack"
     end
