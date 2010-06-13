@@ -1,13 +1,13 @@
 module Scratch
   module ControlWords
     def exec
-      self.stack.get_n_stack_items 1, [Array] do |code_list|
+      self.get_n_types Array do |code_list|
         interpret make_word( code_list )
       end
     end
 
     def times
-      self.stack.get_n_stack_items 2, [Array, Fixnum] do |code_list, num_times|
+      self.get_n_types Array, Fixnum do |code_list, num_times|
         word = make_word code_list
         num_times.times do 
           word.call
@@ -16,19 +16,19 @@ module Scratch
     end
 
     def is_true?
-      self.stack.get_n_stack_items 2, [Boolean, Array] do |cond, code_list|
+      self.get_n_types Boolean, Array do |cond, code_list|
         interpret make_word( code_list ) if cond
       end
     end
 
     def is_false?
-      self.stack.get_n_stack_items 2, [Boolean, Array] do |cond, code_list|
+      self.get_n_types Boolean, Array do |cond, code_list|
         interpret make_word( code_list ) unless cond
       end
     end
 
     def if_else?
-      self.stack.get_n_stack_items 3, [Boolean, Array, Array] do |cond, true_code, false_code|
+      self.get_n_types Boolean, Array, Array do |cond, true_code, false_code|
         if cond
           interpret make_word( true_code )
         else
@@ -43,13 +43,13 @@ module Scratch
 #    end
 
     def break?
-      self.stack.get_n_stack_items 1, [Boolean] do |is_break|
+      self.get_n_types Boolean do |is_break|
         self.break_state = true if is_break
       end
     end
 
     def loop
-      self.stack.get_n_stack_items 1, [Array] do |code_list|
+      self.get_n_types Array do |code_list|
         word = make_word code_list
         old_break_state = break_state
         break_state = false

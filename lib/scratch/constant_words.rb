@@ -1,7 +1,7 @@
 module Scratch
   module ConstantWords
     def const
-      self.stack.get_n_stack_items 1, [Fixnum] do |value|
+      self.get_n_types Fixnum do |value|
         const_name = lexer.next_word
         raise UnexpectedEOI.new if const_name.nil?
 

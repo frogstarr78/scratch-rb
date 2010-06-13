@@ -31,40 +31,6 @@ module Scratch
       @stack.__getobj__
     end
 
-    def pop n = nil
-      return stack.pop if n.nil? or n == 1
-      stack.pop n
-    end
-
-    def last n = nil
-      return stack.last if n.nil? or n == 1
-      stack.last n
-    end
-
-    def get_n_stack_items num, validations
-      error_if_stack_isnt! num 
-
-      stack_items = stack.pop(num)
-      stack_items.validate! validations
-
-      yield *stack_items
-    end
-
-    def replace_n_pop_items num, validations, &block
-      items = get_n_stack_items( num, validations, &block )
-      if items.is_array?
-        items.each do |item|
-          self.stack << item
-        end
-      else
-        self.stack << items
-      end
-    end
-
-    def error_if_stack_isnt! check
-      raise StackTooSmall.new stack, check if self.stack.size < check 
-    end
-
     def method_missing sym, *arguments
       meth = self.stack.method(sym)
       return meth.call if meth.arity == 0

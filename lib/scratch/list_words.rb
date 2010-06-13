@@ -25,13 +25,13 @@ module Scratch
     end
 
     def length
-      self.stack.replace_n_pop_items 1, [Array] do |code_list|
+      self.replace_n_types Array do |code_list|
         code_list.size
       end
     end
 
     def item
-      self.stack.replace_n_pop_items 2, [Array, Fixnum] do |code_list, index|
+      self.replace_n_types Array, Fixnum do |code_list, index|
         code_list[index]
       end
     end

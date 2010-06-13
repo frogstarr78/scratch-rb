@@ -99,11 +99,37 @@ module Scratch
     end
 
     def send_ruby_op op
-      self.stack.replace_n_pop_items 2, [Object, Object] do |left_term, right_term|
+      self.replace_n_types Object, Object do |left_term, right_term|
         left_term.send( op, right_term )
       end
     end
     private :send_ruby_op
+
+    def get_n_types *klasses
+      min_expected_stack_size = klasses.size
+
+      error_if_stack_isnt! min_expected_stack_size 
+
+      stack_items = stack.pop min_expected_stack_size
+      stack_items.validate! klasses
+
+      yield *stack_items
+    end
+
+    def replace_n_types *klasses, &block
+      items = get_n_types *klasses, &block
+      if items.is_a? Array
+        items.each do |item|
+          self.stack << item
+        end
+      else
+        self.stack << items
+      end
+    end
+
+    def error_if_stack_isnt! check
+      raise StackTooSmall.new stack, check if self.stack.size < check 
+    end
 
     include PrintingWords
     include MathWords

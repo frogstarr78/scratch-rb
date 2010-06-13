@@ -17,7 +17,7 @@ module Scratch
     end
 
     def not
-      self.stack.replace_n_pop_items( 1, [Boolean] ) {|item| !item }
+      self.replace_n_types( Boolean ) {|item| !item }
     end
   end
 end

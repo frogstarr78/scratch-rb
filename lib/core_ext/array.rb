@@ -1,8 +1,4 @@
 class Array
-  def is_array?
-    true
-  end
-
   def validate! against
     items_and_their_valid_type = self.zip against
     items_and_their_valid_type.each do |(item, valid_type)|
