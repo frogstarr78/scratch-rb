@@ -25,16 +25,16 @@ module Scratch
     end
 
     def length
-      self.stack.get_n_stack_items do |code_list|
+      self.stack.replace_n_pop_items do |code_list|
 #        raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
-        self.stack << code_list.size
+        code_list.size
       end
     end
 
     def item
-      self.stack.get_n_stack_items 2 do |code_list, index|
+      self.stack.replace_n_pop_items 2 do |code_list, index|
         raise MissingListExpectation.new(code_list) unless code_list.is_a? Array
-        self.stack << code_list[index]
+        code_list[index]
       end
     end
   end
