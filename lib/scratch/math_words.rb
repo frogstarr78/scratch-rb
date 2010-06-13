@@ -23,7 +23,7 @@ module Scratch
       math_op "/"
     end
 
-    def rt
+    define_method "√" do
       self.stack.get_n_stack_items do |num|
         self.stack << ( num ** 0.5 )
       end
