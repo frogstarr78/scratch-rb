@@ -170,7 +170,7 @@ if $0 == __FILE__
   terp.run '" ----------------------" print'
   terp.run '" - rot" print'
   terp.run "rot pstack"
-  terp.run '" ----------------------" print'
+  terp.run '" ----------------------" puts'
   terp.run "10 pstack"
   terp.run "1 2 3 print print print"
   terp.run "2 2 + print"

@@ -1,7 +1,7 @@
 module Scratch
   module PrintingWords
     def print
-      self.stack.get_n_stack_items Object do |stuff|
+      self.get_n_types Object do |stuff|
         Kernel.print stuff
       end
     end
@@ -13,7 +13,7 @@ module Scratch
     end
 
     def pstack
-      Kernel.puts self.stack
+      Kernel.puts self.stack.stack
     end
   end
 end
