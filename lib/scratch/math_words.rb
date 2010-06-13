@@ -17,7 +17,7 @@ module Scratch
     end
 
     define_method "√" do
-      self.stack.replace_n_pop_items do |num|
+      self.stack.replace_n_pop_items 1, [Fixnum] do |num|
         num ** 0.5
       end
     end

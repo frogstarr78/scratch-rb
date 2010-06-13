@@ -35,10 +35,10 @@ class TestListWords < TestHelper
         end
       end
 
-      should "raise MissingListExpectation error when first element on the stack isn't an array" do
+      should "raise InvalidType error when first element on the stack isn't an array" do
         terp.run '1'
         assert_equal_stack [1], terp.stack
-        assert_raise Scratch::MissingListExpectation do
+        assert_raise Scratch::InvalidType do
           terp.run "length"
         end
       end
@@ -80,10 +80,10 @@ class TestListWords < TestHelper
         end
       end
 
-      should "raise MissingListExpectation error when first element on the stack isn't an array" do
+      should "raise InvalidType error when first element on the stack isn't an array" do
         terp.run '1 1'
         assert_equal_stack [1, 1], terp.stack
-        assert_raise Scratch::MissingListExpectation do
+        assert_raise Scratch::InvalidType do
           terp.run "item"
         end
       end

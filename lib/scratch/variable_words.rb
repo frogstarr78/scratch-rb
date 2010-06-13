@@ -9,14 +9,14 @@ module Scratch
     end
 
     def store
-      self.stack.get_n_stack_items 2 do |value, var|
+      self.stack.get_n_stack_items 2, [Object, Object] do |value, var|
         @var = var
         @var.value = value
       end
     end
 
     def fetch
-      self.stack.get_n_stack_items do |var|
+      self.stack.get_n_stack_items 1, [Object] do |var|
         @var = var
         self.stack << @var.value
       end

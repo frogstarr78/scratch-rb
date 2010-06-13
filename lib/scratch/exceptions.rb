@@ -23,9 +23,9 @@ module Scratch
     end
   end
 
-  class MissingListExpectation < Exception
-    def initialize received
-      super "List expected, received instead '#{received.class}'"
+  class InvalidType < Exception
+    def initialize expected_class, received_class
+      super "Expecting a(n) '#{expected_class}' class, but received a(n) '#{received_class}' class instead."
     end
   end
 end

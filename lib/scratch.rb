@@ -99,7 +99,7 @@ module Scratch
     end
 
     def send_ruby_op op
-      self.stack.replace_n_pop_items 2 do |left_term, right_term|
+      self.stack.replace_n_pop_items 2, [Object, Object] do |left_term, right_term|
         left_term.send( op, right_term )
       end
     end

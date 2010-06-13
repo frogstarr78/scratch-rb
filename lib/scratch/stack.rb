@@ -41,13 +41,17 @@ module Scratch
       stack.last n
     end
 
-    def get_n_stack_items num = 1
+    def get_n_stack_items num, validations
       error_if_stack_isnt! num 
-      yield *stack.pop(num)
+
+      stack_items = stack.pop(num)
+      stack_items.validate! validations
+
+      yield *stack_items
     end
 
-    def replace_n_pop_items num = 1, &block
-      items = get_n_stack_items( num, &block )
+    def replace_n_pop_items num, validations, &block
+      items = get_n_stack_items( num, validations, &block )
       if items.is_array?
         items.each do |item|
           self.stack << item

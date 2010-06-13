@@ -20,8 +20,9 @@ class TestControlWords < TestHelper
           terp.run 'exec'
         end
       end
-      should "raise MissingListExpectation error the stack doesn't have a list" do
-        assert_raise Scratch::MissingListExpectation do
+
+      should "raise InvalidType error the stack doesn't have a list" do
+        assert_raise Scratch::InvalidType do
           terp.run '2 3 + exec'
         end
       end
@@ -38,6 +39,7 @@ class TestControlWords < TestHelper
           terp.run 'times'
         end
       end
+
       should "raise StackTooSmall error when called with one element in the stack" do
         terp.run '[ 3 2 + ]'
         assert_raise Scratch::StackTooSmall do
@@ -51,9 +53,9 @@ class TestControlWords < TestHelper
         end
       end
 
-      should "raise MissingListExpectation error when the first element in the stack isn't a list" do
+      should "raise InvalidType error when the first element in the stack isn't a list" do
         terp.run '3 3'
-        assert_raise Scratch::MissingListExpectation do
+        assert_raise Scratch::InvalidType do
           terp.run 'times'
         end
       end
@@ -90,9 +92,9 @@ class TestControlWords < TestHelper
         end
       end
 
-      should "raise MissingListExpectation error when the second element in the stack isn't a list" do
+      should "raise InvalidType error when the second element in the stack isn't a list" do
         terp.run 'true 3'
-        assert_raise Scratch::MissingListExpectation do
+        assert_raise Scratch::InvalidType do
           terp.run 'is_true?'
         end
       end
@@ -129,9 +131,9 @@ class TestControlWords < TestHelper
         end
       end
 
-      should "raise MissingListExpectation error when the first element in the stack isn't a list" do
+      should "raise InvalidType error when the first element in the stack isn't a list" do
         terp.run 'false 3'
-        assert_raise Scratch::MissingListExpectation do
+        assert_raise Scratch::InvalidType do
           terp.run 'is_false?'
         end
       end
@@ -181,16 +183,16 @@ class TestControlWords < TestHelper
         end
       end
 
-      should "raise MissingListExpectation error when the second element in the stack isn't a list" do
+      should "raise InvalidType error when the second element in the stack isn't a list" do
         terp.run 'true 5 [ 3 dup ]'
-        assert_raise Scratch::MissingListExpectation do
+        assert_raise Scratch::InvalidType do
           terp.run 'if_else?'
         end
       end
 
-      should "raise MissingListExpectation error when the third element in the stack isn't a list" do
+      should "raise InvalidType error when the third element in the stack isn't a list" do
         terp.run 'true [ 3 dup ] 5'
-        assert_raise Scratch::MissingListExpectation do
+        assert_raise Scratch::InvalidType do
           terp.run 'if_else?'
         end
       end
@@ -238,9 +240,9 @@ class TestControlWords < TestHelper
         end
       end
 
-      should "raise MissingListExpectation error when the first element in the stack isn't a list" do
+      should "raise InvalidType error when the first element in the stack isn't a list" do
         terp.run '9'
-        assert_raise Scratch::MissingListExpectation do
+        assert_raise Scratch::InvalidType do
           terp.run 'loop'
         end
       end

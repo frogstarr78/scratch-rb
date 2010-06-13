@@ -231,14 +231,14 @@ class TestScratchStack < TestHelper
       end
 
       should "yield 1 item by default " do
-        stack.get_n_stack_items do |*items|
+        stack.get_n_stack_items 1, [Fixnum] do |*items|
           @yielded_items = items
         end
         assert_equal [4], @yielded_items
       end
 
       should "yield the requested number of items" do
-        stack.get_n_stack_items 2 do |*items|
+        stack.get_n_stack_items 2, [Fixnum, Fixnum] do |*items|
           @yielded_items = items
         end
         assert_equal [3, 4], @yielded_items
@@ -246,7 +246,7 @@ class TestScratchStack < TestHelper
 
       should "rather than yield number of items, raise an error, when the number of items aren't available" do
         assert_raise Scratch::StackTooSmall do
-          stack.get_n_stack_items 3 do |*items|
+          stack.get_n_stack_items 3, [Fixnum, Fixnum, Fixnum] do |*items|
             @yielded_items = items
           end
           assert_equal [], @yielded_items

@@ -11,7 +11,7 @@ module Scratch
     end
 
     def swap
-      self.stack.replace_n_pop_items 2 do |_2os, tos|
+      self.stack.replace_n_pop_items 2, [Object, Object] do |_2os, tos|
         [ tos, _2os ]
       end
     end
@@ -22,7 +22,7 @@ module Scratch
     end
 
     def rot
-      self.stack.replace_n_pop_items 3 do |_3os, _2os, tos|
+      self.stack.replace_n_pop_items 3, [Object, Object, Object] do |_3os, _2os, tos|
         [ _2os,  tos,  _3os ]
       end
     end
