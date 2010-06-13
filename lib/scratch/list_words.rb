@@ -1,26 +1,19 @@
 module Scratch
   module ListWords
     define_method :"[" do
-      list = []
-      old_stack = self.stack
-      self.stack = list
+      self.stack.start_compiling!
 
       word = lexer.next_word
       until word.nil?
         break if word == ']'
 
-        token = compile word
-        if Scratch::IMMEDIATES.include? word
-          interpret token
-        else
-          self.stack << token
-        end
+        interpret! word
         word = lexer.next_word
       end
       raise UnexpectedEOI.new unless word == ']'
 
-      list = self.stack
-      self.stack = old_stack
+      list = self.stack.stack.dup
+      self.stack.stop_compiling!
       self.stack << list
     end
 

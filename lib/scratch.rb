@@ -59,16 +59,22 @@ module Scratch
 
       word = lexer.next_word
       until word.nil?
-        token = self.compile word
-        if IMMEDIATES.include? word
-          self.interpret token
-        elsif self.stack.compiling?
-          self.stack << token
-        else
-          self.interpret token
-        end
+        interpret! word
         word = lexer.next_word
       end
+    end
+
+    def interpret! word
+      token = compile word
+
+      if IMMEDIATES.include? word
+        self.interpret token
+      elsif self.stack.compiling?
+        self.stack << token
+      else
+        self.interpret token
+      end
+      nil
     end
 
     def compile word
@@ -109,68 +115,66 @@ if $0 == __FILE__
   include Scratch
   terp = Scratch::Scratch.new
 
-#  terp.run "1"
-#  terp.run "drop"
-  terp.run 'puts'
+  terp.run "1"
+  terp.run "drop"
   terp.run "1 2 3 45 678"
-#  terp.run "pstack"
-#  terp.run '" ----------------------" print'
-#  terp.run '" - dup" print'
-#  terp.run "dup pstack"
-#  terp.run '" ----------------------" print'
-#  terp.run '" - drop" print'
-#  terp.run "drop pstack"
-#  terp.run '" ----------------------" print'
-#  terp.run '" - swap" print'
-#  terp.run "swap pstack"
-#  terp.run '" ----------------------" print'
-#  terp.run '" - over" print'
-#  terp.run "over pstack"
-#  terp.run '" ----------------------" print'
-#  terp.run '" - rot" print'
-#  terp.run "rot pstack"
-#  terp.run '" ----------------------" print'
-#  terp.run "10 pstack"
-#  terp.run "1 2 3 print print print"
-#  terp.run "2 2 + print"
-#  terp.run "2 2 - print"
-#  terp.run "4 2 / print"
-#  terp.run "3 3 * 4 4 * + √ print"
-#  terp.run "var a"
-#  terp.run "var b"
-#  terp.run "12 b store"
-#  terp.run "10 a store"
-#  terp.run "a fetch print"
-#  terp.run "b fetch print"
-#  terp.run "12 a store"
-#  terp.run "a fetch print"
-#  terp.run "b fetch print"
-#  terp.run "5 const Q"
-#  terp.run "Q print"
-#  terp.run '" Hello World!" print'
-#  terp.run '/* abc */ " Hello World!" print'
-#  terp.run '/* abc */ Q print'
-#  terp.run 'def HYPOT  dup * swap dup * + √  end'
-#  terp.run '3 4 hypot .'
-#  terp.run '[ 1 2 3 ] .'
-#  terp.run '[ 1 2 3 [ 4 5 6 ] 7 ] .'
-#  terp.run '[ 1 2 3 [ 4 5 6 ] 7 ] 3 item .'
-#  terp.run '[ 1 2 3 ] 1 item .'
-#  terp.run '[ 1 " hello" print ] .'
-#  terp.run '[ 1 2 3 ] run .'
-#  terp.run '[ 1 ! ] 5 times'
-#  terp.run 'false [ 1 ! ] is_true?'
-#  terp.run 'true [ 3 ! ] is_true?'
-#  terp.run 'false [ 2 ! ] is_false?'
-#  terp.run 'true [ 4 ! ] is_false?'
-#  terp.run 'false [ 5 ! ] is_false?'
-#  terp.run 'false [ 6 ! ] is_false?'
-#  terp.run 'true [ 7 ! ] is_false?'
-#  terp.run 'true [ 7 ! ] [ 8 ! ] if_else?'
-#  terp.run 'false [ 7 ! ] [ 8 ! ] if_else?'
-#  terp.run 'true false or [ 9 . ] is_true?'
-#  terp.run 'true false and [ 10 . ] is_true?'
-#  terp.run 'false not [ 11 . ] is_true?'
-#  terp.run '1 [ dup 3 > break? dup print 1 + ] loop'
-  #puts terp.dictionary.inspect
+  terp.run "pstack"
+  terp.run '" ----------------------" print'
+  terp.run '" - dup" print'
+  terp.run "dup pstack"
+  terp.run '" ----------------------" print'
+  terp.run '" - drop" print'
+  terp.run "drop pstack"
+  terp.run '" ----------------------" print'
+  terp.run '" - swap" print'
+  terp.run "swap pstack"
+  terp.run '" ----------------------" print'
+  terp.run '" - over" print'
+  terp.run "over pstack"
+  terp.run '" ----------------------" print'
+  terp.run '" - rot" print'
+  terp.run "rot pstack"
+  terp.run '" ----------------------" print'
+  terp.run "10 pstack"
+  terp.run "1 2 3 print print print"
+  terp.run "2 2 + print"
+  terp.run "2 2 - print"
+  terp.run "4 2 / print"
+  terp.run "3 3 * 4 4 * + √ print"
+  terp.run "var a"
+  terp.run "var b"
+  terp.run "12 b store"
+  terp.run "10 a store"
+  terp.run "a fetch print"
+  terp.run "b fetch print"
+  terp.run "12 a store"
+  terp.run "a fetch print"
+  terp.run "b fetch print"
+  terp.run "5 const Q"
+  terp.run "Q print"
+  terp.run '" Hello World!" print'
+  terp.run '/* abc */ " Hello World!" print'
+  terp.run '/* abc */ Q print'
+  terp.run 'def hypot  dup * swap dup * + √  end'
+  terp.run '3 4 hypot puts'
+  terp.run '[ 1 2 3 ] puts'
+  terp.run '[ 1 2 3 [ 4 5 6 ] 7 ] puts'
+  terp.run '[ 1 2 3 [ 4 5 6 ] 7 ] 3 item puts'
+  terp.run '[ 1 2 3 ] 1 item puts'
+  terp.run '[ 1 " hello" print ] puts'
+  terp.run '[ 1 2 3 ] exec puts'
+  terp.run '[ 1 print ] 5 times'
+  terp.run 'false [ 1 print ] is_true?'
+  terp.run 'true [ 3 print ] is_true?'
+  terp.run 'false [ 2 print ] is_false?'
+  terp.run 'true [ 4 print ] is_false?'
+  terp.run 'false [ 5 print ] is_false?'
+  terp.run 'false [ 6 print ] is_false?'
+  terp.run 'true [ 7 print ] is_false?'
+  terp.run 'true [ 7 print ] [ 8 print ] if_else?'
+  terp.run 'false [ 7 print ] [ 8 print ] if_else?'
+  terp.run 'true false or [ 9 puts ] is_true?'
+  terp.run 'true false and [ 10 puts ] is_true?'
+  terp.run 'false not [ 11 puts ] is_true?'
+  terp.run '1 [ dup 3 > break? dup print 1 + ] loop'
 end
