@@ -2,10 +2,10 @@ require 'helper'
 
 class TestBooleanClass < TestHelper
   context "FalseClass" do
-    should "respond_to? :&&" do
+    should "respond_to? #&&" do
       assert_respond_to false, "&&"
     end
-    should "respond_to? :||" do
+    should "respond_to? #||" do
       assert_respond_to false, "||"
     end
     should "respond_to? #!" do
@@ -39,10 +39,10 @@ class TestBooleanClass < TestHelper
   end
 
   context "TrueClass" do
-    should "respond_to? :&&" do
+    should "respond_to? #&&" do
       assert_respond_to true, "&&"
     end
-    should "respond_to? :||" do
+    should "respond_to? #||" do
       assert_respond_to true, "||"
     end
     should "respond_to? #!" do
