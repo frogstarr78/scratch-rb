@@ -12,6 +12,10 @@ class TestBooleanClass < TestHelper
       assert_respond_to false, "!"
     end
 
+    should "be_a? Boolean" do
+      assert_equal true, false.is_a?(Boolean)
+    end
+
     context "\b#!" do
       should "be true" do
         assert false.send("!")
@@ -32,6 +36,7 @@ class TestBooleanClass < TestHelper
       should "work when true" do
         assert false.send("||", true)
       end
+
       should "work when false" do
         assert !false.send("||", false)
       end
@@ -42,11 +47,17 @@ class TestBooleanClass < TestHelper
     should "respond_to? #&&" do
       assert_respond_to true, "&&"
     end
+
     should "respond_to? #||" do
       assert_respond_to true, "||"
     end
+
     should "respond_to? #!" do
       assert_respond_to true, "!"
+    end
+
+    should "be_a? Boolean" do
+      assert_equal true, false.is_a?(Boolean)
     end
 
     context "\b#!" do
@@ -69,6 +80,7 @@ class TestBooleanClass < TestHelper
       should "work when true" do
         assert true.send("||", true)
       end
+
       should "work when false" do
         assert true.send("||", false)
       end
