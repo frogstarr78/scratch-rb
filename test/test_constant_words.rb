@@ -29,13 +29,6 @@ class TestConstantWords < TestHelper
           terp.run "10 const"
         end
       end
-
-      should "raise StackTooSmall error when called with an empty stack" do
-        assert_equal_stack [], terp.stack
-        assert_raise Scratch::StackTooSmall do
-          terp.run "const"
-        end
-      end
     end
   end
 end

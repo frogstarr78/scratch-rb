@@ -26,50 +26,20 @@ class TestVariableWords < TestHelper
       end
     end
 
-    context "store method" do
-      should "works" do
-        assert !terp.respond_to?( :b )
-        terp.run 'var b'
-        terp.run '1 b store'
-        assert_instance_of Scratch::Variable, terp.b.pop
-        assert_respond_to terp, :b
-      end
-
-      should "raise StackTooSmall error when called with an empty stack" do
-        terp.run 'var c'
-        assert_equal_stack [], terp.stack
-        assert_raise Scratch::StackTooSmall do
-          terp.run "store"
-        end
-      end
-
-      should "raise StackTooSmall error when called with stack size of 1" do
-        terp.run 'var d'
-        assert_equal_stack [], terp.stack
-        assert_raise Scratch::StackTooSmall do
-          terp.run "d store"
-        end
-      end
+    should "set the value of the variable when store method called" do
+      assert !terp.respond_to?( :b )
+      terp.run 'var b'
+      terp.run '1 b store'
+      assert_instance_of Scratch::Variable, terp.b.pop
+      assert_respond_to terp, :b
     end
 
-    context "fetch method" do
-      should "works" do
-        assert !terp.respond_to?( :e )
-        terp.run 'var e'
-        terp.run '1 e store'
-        terp.run 'e fetch'
-        assert_equal_stack [1], terp.stack
-      end
-
-      should "raise StackTooSmall error when called with an empty stack" do
-        terp.run 'var f'
-        terp.run '1 f store'
-        assert_equal_stack [], terp.stack
-        assert_respond_to terp, :f
-        assert_raise Scratch::StackTooSmall do
-          terp.run "fetch"
-        end
-      end
+    should "gets the variable value when fetch is called" do
+      assert !terp.respond_to?( :e )
+      terp.run 'var e'
+      terp.run '1 e store'
+      terp.run 'e fetch'
+      assert_equal_stack [1], terp.stack
     end
   end
 end

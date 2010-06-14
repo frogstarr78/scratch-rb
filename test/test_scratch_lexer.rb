@@ -89,6 +89,7 @@ class TestScratchLexer < TestHelper
         word = lexer.next_chars_to '"'
         assert_nil word
       end
+
       should "slurp characters up to the next occurance of the supplied char with stuff inside" do
         lexer.parse 'some stuff"'
         word = lexer.next_chars_to '"'
