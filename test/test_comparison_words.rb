@@ -8,7 +8,7 @@ class TestComparisonWords < TestHelper
       end
     end
 
-    should "correctly compare last two stack items using <=" do
+    should "correctly compare last two stack items using <" do
       terp.run "1 2 <"
       assert_equal_stack [true], terp.stack
 
